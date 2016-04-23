@@ -1,0 +1,7 @@
+H:\grammer_test\grammer_test\obj\Debug\grammer_test.csprojResolveAssemblyReference.cache
+H:\grammer_test\grammer_test\obj\Debug\grammer_test.csproj.GenerateResource.Cache
+H:\grammer_test\grammer_test\bin\Debug\AGrammar.dll
+H:\grammer_test\grammer_test\bin\Debug\AGrammar.pdb
+H:\grammer_test\grammer_test\obj\Debug\AGrammar.Properties.Resources.resources
+H:\grammer_test\grammer_test\obj\Debug\AGrammar.dll
+H:\grammer_test\grammer_test\obj\Debug\AGrammar.pdb

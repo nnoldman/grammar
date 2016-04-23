@@ -1,0 +1,8 @@
+H:\grammer_test\PB_Grammar\bin\Debug\PB_Grammar.exe.config
+H:\grammer_test\PB_Grammar\bin\Debug\PB_Grammar.exe
+H:\grammer_test\PB_Grammar\bin\Debug\PB_Grammar.pdb
+H:\grammer_test\PB_Grammar\bin\Debug\AGrammar.dll
+H:\grammer_test\PB_Grammar\bin\Debug\AGrammar.pdb
+H:\grammer_test\PB_Grammar\obj\Debug\PB_Grammar.csprojResolveAssemblyReference.cache
+H:\grammer_test\PB_Grammar\obj\Debug\PB_Grammar.exe
+H:\grammer_test\PB_Grammar\obj\Debug\PB_Grammar.pdb
