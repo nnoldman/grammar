@@ -5,44 +5,51 @@ using System.Text;
 
 public class Exp
 {
-    //public Exp Or(int tokenType)
-    //{
+    public static Exp Empty = new Exp("empty");
+    public static Exp Add(string name)
+    {
+        throw new Exception();
+    }
+    public static Exp Get(string name)
+    {
+        throw new Exception();
+    }
+    public Exp Or(params object[] para)
+    {
+        throw new Exception();
+    }
+    public Exp OrArray()
+    {
+        throw new Exception();
+    }
+    public Exp Node(string conent)
+    {
+        throw new Exception();
 
-    //}
-    //public Exp And(params object[] para)
-    //{
+    }
+    public Exp Push(string content)
+    {
+        throw new Exception();
+    }
+    public Exp Pop()
+    {
+        throw new Exception();
+    }
 
-    //}
-    //public Exp Or(string content)
-    //{
+    public Exp Is(params object[] para)
+    {
+        throw new Exception();
+    }
+    public Exp(string content)
+    {
 
-    //}
-    //public Exp And(string tokenType)
-    //{
+    }
 
-    //}
-    //public Exp And(Exp e)
-    //{
-
-    //}
-    //public Exp Or(Exp e)
-    //{
-
-    //}
-    //public Exp Node(string conent)
-    //{
-
-    //}
-    //public Exp Push(string content)
-    //{
-
-    //}
-    //public Exp Pop()
-    //{
-
-    //}
-    //public Exp Array(Exp exp)
-    //{
-
-    //}
+}
+public class Or
+{
+    public static Exp One(params object[] para)
+    {
+        throw new Exception();
+    }
 }

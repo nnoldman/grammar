@@ -53,6 +53,15 @@ namespace PB_Grammar
 
         AGrammar mGrammar ;
 
+        public  void Test()
+        {
+            Exp.Add("package").Is(PBTokenType.Package, AScanner.ID, ".", AScanner.ID, ";");
+            Exp.Add("typename").Is(Or.One(PBTokenType.TypeName, AScanner.ID));
+            Exp.Add("condtion").Is(Or.One(PBTokenType.Option, PBTokenType.Repeated));
+            Exp.Add("member").Is(Exp.Get("condtion"),Exp.Get("typename"),AScanner.ID,"=",AScanner.ID,";");
+            Exp.Add("message_body").Is(Or.One(Exp.Get("member").OrArray(), Exp.Empty));
+            Exp.Add("message").Is(PBTokenType.Message, AScanner.ID, "{", Exp.Get("message_body"), "}", Or.One(";", Exp.Empty));
+        }
         public bool Load()
         {
             mGrammar = AGrammar.Instance;
