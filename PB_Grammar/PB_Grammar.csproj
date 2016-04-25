@@ -48,9 +48,6 @@
     <Compile Include="ProtoBufferParser.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\AGrammar\AGrammar.csproj">
       <Project>{9025fbe5-4590-4596-893a-9b061b4dbabd}</Project>
       <Name>AGrammar</Name>

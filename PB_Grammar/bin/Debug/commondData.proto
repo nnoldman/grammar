@@ -1,0 +1,963 @@
+package protobuf.serialize;
+
+message t_GameZoneProto
+{
+	optional uint32 zone		=1;
+	optional uint32	game		=2;
+}
+message t_NewLoginSessionProto
+{
+        optional uint32 wdLoginID       	=1;    
+        optional uint32 wdGatewayID     	=2;    
+        optional uint32 loginTempID     	=3; 
+	optional bytes domain			=4;
+	optional uint32 wdPort			=5;
+	optional t_GameZoneProto gameZone	=6;
+	optional t_GameZoneProto flatZone	=7;
+	optional uint64	accid			=8;
+	optional uint32	type			=9;
+	optional uint32	state			=10;
+	optional string name			=11;
+	optional bytes	passwd			=12;
+	optional bytes	client_ip		=13;
+	optional bytes numpasswd		=14;
+	optional bytes passwd2			=15;
+	optional uint32   accSafe		=16;
+	optional uint32   wdNetType		=17;
+	optional uint32   userType		=18;
+	optional uint32   createTime		=19;
+	optional uint32   viplevel		=20;
+	optional uint32   memlevel		=21;
+	optional uint32   annualFlag		=22;
+	optional uint32   memberFlag		=23;
+	optional uint32   vipFlag		=24;
+	optional uint32	  microclient		=25;//是否微端登陆
+
+	optional uint32	  qqmember		=26;//腾讯会员 
+	optional uint32	  qqyearmember		=27;//腾讯年度会员
+	optional uint32	  qqlevel		=28;	//腾讯会员等级
+	optional bytes	  openid		=29;//唯一账号ID 
+	optional bytes	  loginurl		=30;//登陆串
+
+};
+
+message t_SelectUserProto
+{
+	optional uint32 ret			=1;//是否成功0无此用户，1成功
+	optional uint32 taskTempid		=2;//TCP连接ID
+	optional t_GameZoneProto zone		=3;
+	optional uint64 accid			=4;//帐号
+	optional string	name			=5;//名字
+	optional uint32	level			=6;//等级
+	optional uint32	onlinetime		=7;//在线时间
+	optional uint32	sex			=8;
+	optional uint32	job			=9;
+	optional uint32	createtime		=10;
+	optional uint32	charid			=11;
+};
+
+
+
+message t_MapUserSculptProto
+{
+        optional uint32 dwHorseID 	=1;                                        
+        optional uint32 dwHeadID	=2;                                         
+        optional uint32 dwBodyID	=3;                                         
+        optional uint32 dwlegsID	=4;                                         
+        optional uint32 dwhandsID	=5;                                        
+        optional uint32 dwfeetsID	=6;                                        
+        optional uint32 dwWeaponID	=7;                                       
+};
+
+message t_SelectUserInfoProto
+{
+	optional uint32 id		=1;                                                              
+        optional string  name		=2;             
+       
+	optional uint32 type		=3;                              
+        optional uint32 level		=4;                             
+        optional uint32 mapid		=5;                            
+        optional string  mapName	=6;                  
+        optional uint32 country		=7;                           
+        optional uint32 group		=8;                                                             
+        optional uint32 face		=9;                                         
+        optional uint32 hair		=10;        
+        optional string  countryName	=11;     
+        optional uint32 bitmask		=12;                       
+        optional uint32 forbidTime	=13;
+        optional uint32 zone_state	=14;                      
+                          
+        optional uint32 target_zone	=15; 
+        optional uint32 acceptPK	=16;                                                  
+        optional t_MapUserSculptProto sculpt	=17;             
+	
+        optional uint32 flatZoneID	=18;
+        optional uint32 gameZoneID	=19;
+        optional uint32 activestar	=20;
+}
+
+message t_stUserInfoUserCmdProto
+{
+	optional uint32 			version                                         = 1;
+	repeated t_SelectUserInfoProto 		userset						= 2;
+}
+
+message t_stCreateSelectUserCmdProto
+{
+	optional string  			strUserName				        = 1;
+	optional uint32 			jobType						= 2;
+	optional uint32				charType					= 3;
+	optional uint32				country						= 4;
+	optional uint32				suitType					= 5;
+	optional string				strPromoterName					= 6;
+}
+
+message t_stMobileChannelChatUserCmdProto
+{
+	optional uint32				dwType						= 1;
+	optional uint32				dwSysInfoType					= 2;
+	optional uint32				dwCharType					= 3;
+	optional uint32				dwCountry					= 4;
+	optional uint32				dwVip						= 5;
+	optional uint32				dwFromUserTempID				= 6;
+	optional uint32				dwChatTime					= 7;
+	optional string 			pstrName					= 8;
+	optional string				pstrChat					= 9;
+}
+
+
+
+
+message MainAttrib {
+   optional uint32 id		=1;
+   optional string name 	=2;
+   optional int32  lv		=3;
+   optional int32  heroLvLimit  =4;
+   optional uint32  energy   	=5;
+   optional uint32 energyLimit  =6;
+   optional uint64 exp		=7;
+   optional uint64 totleExp	=8;
+   optional int32  title	=9;
+   optional int32  icon		=10;
+   optional int32  iconEdage	=11;
+   optional uint32 gold		=12;//元宝
+   optional uint32 money	=13;//铜钱
+   optional uint32 exploit	=14;//当前功勋
+   optional uint32 totalpkscore =15;//总战力
+}
+
+
+message stObjectLocationProto
+{
+	optional uint32 dwLocation      	=1;//格子类型
+        optional uint32 x                       =2;//x
+}
+
+message t_ObjectProto
+{
+	optional uint32 qwThisID                        = 1;//物品唯一ID
+	optional uint32 dwObjectID                      = 2;//物品类别i
+	optional string strName                         = 3;//名称
+	optional uint32 dwNum                           = 4;//数量
+	optional stObjectLocationProto pos        	= 5;//item location in packet
+	optional uint32	lv				= 6;
+}
+
+message t_AddObjectInfoProto
+{
+	optional uint32 byActionType			= 1;
+	optional t_ObjectProto obj			= 2;
+}	
+
+
+message t_stAddObjectListUnityUserCmdProto
+{
+	optional uint32 			version                                         = 1;
+	repeated t_AddObjectInfoProto 		userset						= 2;
+}
+
+message t_DaySignRwdRecProto
+{
+	optional uint32	id			= 1;
+	optional uint32 state			= 2;
+}
+
+message t_DaySignCmdProto
+{
+	repeated t_DaySignRwdRecProto 	signs		= 1;
+}
+
+message t_MailOpenCmdProto
+{
+	optional uint32 mailid		=1;
+}
+
+message t_MailAddListProto
+{
+	optional uint32 id   		        =1;
+	optional uint32 state          		=2;
+	optional string fromname          	=3;
+	optional string title	          	=4;
+	optional uint32 accessory          	=5;
+	optional uint32 createtime          	=6;
+	optional uint32 endtime          	=7;
+	optional uint32 type	          	=8;
+	optional uint32 needmoney	        =9;
+}
+
+message t_MailContentProto
+{
+	optional uint32 id   		        =1;
+	optional string title	          	=2;
+	optional uint32 accessory  		=3;
+	optional string text	          	=4;
+	optional uint32 sendmoney  		=5;
+	optional uint32 recvmoney  		=6;
+	optional uint32 sendgold  		=7;
+	optional uint32 recvgold  		=8;
+	optional t_ObjectProto item		=9;	
+}
+
+//士兵数据
+message t_PetSoldierStructProto
+{
+	optional uint32 	type			=1;//士兵类型
+	optional uint32 	level			=2;//等级
+	optional uint32		star			=3;//星数
+	optional uint64		exp			=4;//当前经验
+	optional uint64		nextexp			=5;//升级需要经验
+}
+
+//士兵列表
+message t_SoldierCmdProto
+{
+	repeated t_PetSoldierStructProto soldiers	=1;//士兵列表
+}
+
+message t_PetGeneralSkillProto
+{
+	optional uint32         id 			=1;
+	optional uint32		level			=2;
+}
+//武将数据
+message t_PetGeneralStructProto
+{
+	optional uint32		id			=1;//武将ID
+	optional uint32 	level			=2;//等级
+	optional uint32		star			=3;//星数
+	optional uint32		deathstate		=4;//0正常，1死亡
+	optional uint64		exp			=5;//当前经验
+	repeated t_PetGeneralSkillProto skillset	=6;//武将技能
+	optional uint64		nextexp			=7;//升级需要经验
+	optional uint32		pkscore			=8;//战力
+
+	optional uint32		souls			=9; //将魂
+	optional uint32		armySoliderCount 	=10;//士兵数量
+	repeated uint32		armyEquips		=11;////部队装备状态,0未装备,1已装备	
+	optional t_PetSoldierStructProto armyInfo	=12;//部队信息  
+	optional uint32		nextsouls		=13;//升级需要的将魂
+				 
+}
+//武将列表
+message t_GeneralCmdProto
+{
+	repeated t_PetGeneralStructProto generals       =1;//武将列表
+}
+
+//选择武将和军师
+message t_FightSettingProto
+{
+	optional uint32		adviser			=1; ///选择的军师
+	repeated uint32		generals		=2; //选择的武将列表
+	optional uint32		mainGeneral 		=3;//主将
+
+}
+
+//选择武将带小兵，每次选择之后全部发送过来
+message t_GeneralSelectSoldierProto
+{
+	optional uint32		general			=1;//武将
+	repeated uint32		soldiers		=2;//带的小兵
+}
+
+//随机名字返回
+message t_stRandNameCmdProto
+{
+	optional string		name			=1;//随机名字
+}
+
+//获取随机名字
+message t_stGetRandNameCmdProto
+{
+	optional uint32		sex			=1;//性别
+}
+
+//学习某个武将的技能
+message t_StudyGeneralSkillProto
+{
+	optional uint32		general			=1;//武将
+	optional uint32		skillid			=2;//技能ID
+}
+
+//单个副本
+message t_OneDungeonProto
+{
+	optional uint32		id              	=1;///副本id
+        optional uint32		enterTimes		=2;///已进入次数
+	optional int32		leftTimes		=3;///剩余次数
+	optional uint32		occupy			=4;///是否攻占
+	optional uint32		star			=5;
+}
+message t_AllDungonCmdProto
+{
+	repeated t_OneDungeonProto   dungeonset		=1;//全部副本记录
+}
+
+//副本通关
+message t_CompleteQuestCmdProto
+{
+	optional uint32 	id			=1;//副本ID
+	optional uint32		result			=2;//结果 0 失败 1通关
+	optional uint32		star			=3;//副本几星
+}
+
+//道具
+message t_ObjProto
+{
+	optional uint32		objid			=1;
+	optional uint32		objnum			=2;
+}
+message t_CompleteQuestRewardCmdProto
+{
+	optional uint32         id                      =1;//副本ID
+	optional uint32		money			=2;//奖励钱
+	repeated t_ObjProto     itemset			=3;
+	optional uint32		exploit			=4;
+	optional uint32		generalExp		=5;
+	optional uint32		soldierExp		=6;
+	optional uint32		captureid		=7;
+	optional uint32		completecount		=8;
+}
+
+//单个俘虏数据
+message t_CaptiveGeneralProto
+{
+	optional uint32		id			=1;//俘虏ID
+	optional uint32		goodwill		=2;//好感度
+}
+
+//所有俘虏信息
+message t_ALLCaptiveGeneralCmdProto
+{
+	repeated t_CaptiveGeneralProto captiveset	=1;
+}
+
+//领取俘虏
+message t_GetOneCaptiveCmdProto
+{
+	optional uint32		id			=1;
+}
+
+//使用道具
+message t_UserItemCmdProto
+{
+	optional uint32 	qwthisid		=1;//道具唯一ID
+	optional uint32		num			=2;//使用道具个数
+}
+//删除道具 
+message t_DelObjCmdProto
+{
+	optional uint32		qwthisid		=1;//道具唯一ID
+}
+//刷新道具个数
+message t_RefreshObjCmdProto
+{
+	optional uint32		qwthisid		=1;//道具唯一ID
+	optional uint32		num			=2;//个数
+	optional uint32		type			=3;//刷新类型
+}
+//移动道具
+message t_MoveObjCmdProto
+{
+	optional uint32         qwthisid                =1;//道具唯一ID
+	optional stObjectLocationProto dst              =2;//当位置为OBJECTCELLTYPE_NONE 扔东西
+}
+//分解道具
+message t_SplitObjCmdProto
+{
+	optional uint32         qwthisid                =1;//道具唯一ID
+	optional uint32         qwnewthisid             =2;//新物品的唯一ID
+	optional uint32         dwnum	                =3;//分裂的数量
+	optional stObjectLocationProto dst              =4;//物品目的位置
+}
+message t_TavernInfoProto
+{
+	optional uint32		id			=1;//ID
+	optional uint32		lastfreetime		=2;//免费倒计时
+	optional uint32		needbuynum		=3;//还需购买几次获得精品
+	optional uint32		todayfreetime		=4;//今日免费次数
+}
+//酒馆抽奖信息
+message t_TavernMainInfoCmdProto
+{
+	repeated t_TavernInfoProto  objs			=1;
+}
+
+//奖励道具
+message t_RewardObjsProto
+{
+	optional uint32		id			=1;
+	optional uint32		num			=2;
+}
+
+//酒馆抽奖道具
+message t_TavernBuyObjectCmdProto
+{
+	optional uint32		id			=1;//id
+	repeated t_RewardObjsProto objs			=2;
+	optional uint32		needbuynum              =3;//还需购买几次获得精品
+
+}
+
+//酒馆抽奖
+message t_TavernStartBuyCmdProto
+{
+	optional uint32		id			=1;//id
+	optional uint32		isbuyten		=2;//是否购买10次
+}
+
+//合成道具
+message t_CombindObjCmdProto
+{
+	optional uint32		id			=1;
+	optional uint32		generalid		=2;
+	optional uint32		qwthisid		=3;
+}
+//合成返回
+message t_CombineObjReturnCmdProto
+{
+	optional uint32         id                      =1;
+	optional uint32         generalid               =2;
+	optional uint32         qwthisid                =3;
+	optional t_ObjectProto  oldobj                  =4;
+}
+
+//领取俸禄
+message t_PalaceGetRewardCmdProto 
+{
+	optional uint32		todayget		=1;//今日是否领取
+	optional uint32		returnresult		=2;//领取成功返回
+}
+
+//玩家数值刷新
+message t_PlayValueUpdayteCmdProto
+{
+   optional uint32 id   	=1;
+   optional uint32 value	=2;
+}
+
+//排行版单项数值
+message t_IndivSortItemProto
+{
+	optional uint32		oldplace		=1;
+	optional string		name			=2;
+	optional uint32		charid			=3;
+	optional uint32		sex			=4;
+	optional uint32		job			=5;
+	optional string		septname		=6;
+	optional uint32		group			=7;
+	optional uint32		vip			=8;
+	optional uint32		level			=9;
+	optional uint32		value			=10;
+	optional uint32		value1			=11;
+}
+
+//排行版数据
+message t_SortListUserCmdProto
+{
+	optional uint32		type			=1;
+	optional uint32		page			=2;
+	optional uint32		totalpage		=3;
+	optional uint32	 	pkscore			=4;
+	optional uint32		place			=5;
+	repeated t_IndivSortItemProto items		=6;
+}
+
+//查询排行版
+message t_RequestSortListUserCmdProto
+{
+	optional uint32		type			=1;
+	optional uint32		page			=2;
+}
+
+
+//小兵升星
+message t_SoldierUpStarCmdProto
+{
+	optional uint32		type			=1;
+	optional uint32		index			=2;
+}
+
+//武将全身装备
+message t_GeneralAllEquipsCmdProto
+{
+	optional uint32  	id			      =1;//武将ID
+	optional t_ObjectProto  equipone                      =2;
+	optional t_ObjectProto  equiptwo                      =3;
+	optional t_ObjectProto  equipthree                    =4;
+	optional t_ObjectProto  equipfour                     =5;
+}
+
+//武将穿脱装备
+message t_GeneralWearEquipCmdProto
+{
+	optional uint32         id                            =1;//武将ID
+	optional uint32		qwthisid		      =2;//物品ID
+	optional uint32		action			      =3;//1穿上 2脱掉
+	optional uint32		oldthisid		      =4;//
+}
+
+message t_rqGeneralUseExpBook
+{
+        optional uint32		 itemID 			=1;
+	optional uint32		 count 				=2;
+	optional uint32 	 generalID 			=3;
+}
+
+message t_rtGeneralUseExpBook
+{
+	optional uint32		itemID				=1;
+	optional uint32		generalID 			=2;
+	optional uint32		value				=3;
+
+}
+
+message t_rqEquipArmy
+{
+	optional uint32	position				=1;
+	optional uint32	generalID				=2;
+}
+
+message t_rqGeneralUpStar
+{
+
+	optional uint32	generalID				=1;
+}
+
+message t_GenralArmyUpdegreeProto
+{
+	optional uint32	generalID				=1;
+	
+}
+
+message t_PrimaryQuestStateProto
+{
+	optional uint32		type				=1;//类型
+	optional uint32		questid				=2;//任务ID
+	optional string		content				=3;
+	optional uint32		count				=4;
+	optional uint32		maxcount			=5;
+	optional uint32		rewardgold			=6;
+	optional uint32		rewardmoney			=7;
+	optional t_RewardObjsProto rewarditem			=8;	
+	optional uint32		state				=9;//状态0 1 2
+	
+	optional string		nametype			=10;
+	optional uint32		icon				=11;
+	optional uint32		toDoID				=12;
+	optional uint32		toDoChildID			=13;
+}
+
+//主线任务
+message t_PrimaryQuestInfoCmdProto
+{
+	repeated t_PrimaryQuestStateProto  questset		=1;
+}
+
+//领取主线任务奖励
+message t_PrimaryQuestGetRewardCmdProto
+{
+	optional uint32		type				=1;
+	optional uint32		questid				=2;
+}
+
+message t_DailyQuestStateProto
+{
+	optional uint32         questid 			=1;
+	optional string		content				=2;
+	optional uint32		count				=3;
+	optional uint32		maxcount			=4;
+	optional uint32		rewardhonor			=5;
+	optional uint32		rewardmoney			=6;
+	optional uint32		state				=7;//状态0 1 2
+	optional string		nametype			=8;
+	optional uint32		icon				=9;
+	optional uint32		toDoID				=10;
+	optional uint32		toDoChildID			=11;
+
+}
+
+message t_DailyQuestInfoCmdProto
+{
+	repeated t_DailyQuestStateProto questset		=1;
+
+}
+//领取每日任务奖励
+message t_DailyQuestGetRewardCmdProto
+{
+	optional uint32		questid				=1;
+}
+
+//士兵改名
+message t_SoldierRenameCmdProto
+{
+	optional uint32		type				=1;
+	optional uint32		index				=2;
+	optional string		name				=3;
+}
+
+//通用道具奖励显示
+message t_CommonRewardCmdProto
+{
+	repeated t_RewardObjsProto itemset			=1;//道具奖励
+}
+
+//获得武将
+message t_GeneralGetCmdProto
+{
+	optional uint32		generalid			=1;//武将ID
+}
+
+//获得士兵
+message t_SoldierGetCmdProto
+{
+	optional uint32		type				=1;
+	optional uint32		num				=2;
+}
+
+//章节奖励内容
+message t_DungeonChapterStateProto
+{
+	optional uint32		id				=1;
+	optional uint32		percentstate			=2;
+	optional uint32		completecount			=3;
+	optional uint32		totalstar			=4;
+	optional uint32		starstate			=5;
+
+}
+
+//全部章节奖励信息
+message t_DungeonChapterRewardCmdProto
+{
+	repeated t_DungeonChapterStateProto chapterdata		=1;
+}
+
+//领取章节奖励
+message t_DungeonGetChapterRwdCmdProto
+{
+	optional uint32		id				=1;
+	optional uint32		iselite				=2;//是否精英副本
+	optional uint32		rewardindex			=3;//1 2 3
+}
+
+message t_GuideStepCmdProto
+{
+	optional uint32		id				=1;///引导id,id为0时结束引导
+	optional uint32		canInterrupt			=2;//是否可以中断,0不可以，1可以;上线时如果不可中断，id设置为nextID
+	optional uint32		nextID				=3;//下一条引导id
+}
+
+message t_GuideCompletedCmdProto
+{
+	optional uint32		id				=1;///引导id,id为0时结束引导
+}
+
+//开始扫荡
+message t_DungeonStartAutoQuestProto
+{
+	optional uint32		questid				=1;//副本ID
+	optional uint32		autoquesttime			=2;//扫荡次数
+}
+
+//扫荡奖励
+message t_OneAutoQuestRewardCmdProto
+{
+        optional uint32         time                      =1;//扫荡次数
+	        
+	optional uint32         money                   =2;//奖励钱
+	
+	repeated t_ObjProto     itemset                 =3; 
+	
+	optional uint32         exploit                 =4; 
+	
+	optional uint32         generalExp              =5; 
+	
+	optional uint32         soldierExp              =6; 
+	
+	optional uint32         captureid               =7; 
+	
+}
+
+message t_DungeonAutoQuestRewardProto
+{
+	optional uint32         questid                         =1;//副本ID
+	repeated t_OneAutoQuestRewardCmdProto	rewardset	=2;//副本扫荡结果
+	repeated t_ObjProto	extralitemset			=3;//额外的扫荡奖励
+}
+
+message t_rqPassChapterReward
+{
+	optional uint32		chapterID		=1;
+}
+
+message t_rtPassChapterReward
+{
+	optional uint32		chapterID		=1;
+	optional uint32		costEnergy		=2;
+	optional uint32		exp			=3;
+	repeated t_ObjProto 	items			=4;
+}
+
+message t_rqChapterRetreat
+{
+	optional uint32		chapterID		=1;
+	optional uint32		reason			=2;
+}
+
+message t_rtChapterTotalReward
+{
+	optional uint32		chapterID		=1;
+	optional uint32		exp			=2;
+	repeated t_ObjProto 	items			=3;
+	optional uint32		first			=4;
+}
+
+message t_rtFirstChargeReward
+{
+	optional uint32		firstcharge		=1;//是否领取首冲奖励
+}
+message t_CommonReward
+{
+	optional uint32		id			=1;
+	optional uint32		state			=2;
+}
+message t_rtConsumptionReward
+{
+	repeated t_CommonReward		data		=1;
+	optional uint32			totalgold	=2;//累计消费
+	optional uint32			starttime	=3;
+	optional uint32			endtime		=4;
+}
+message t_rqGetConsumptionReward
+{
+	optional uint32		id			=1;
+}
+message t_CommonCountReward
+{
+	optional uint32		id			=1;
+	optional uint32		gettimes		=2;//已经领取的次数
+	optional uint32		maxtimes		=3;//最大次数
+}
+message t_rtSingleChargeReward
+{
+	repeated t_CommonCountReward	data		=1;
+}
+message t_rqGetSingleChargeReward
+{
+	optional uint32		id			=1;
+}
+
+message t_rtAccuChargeReward
+{
+	 repeated t_CommonReward         data            =1;
+	 optional uint32		 totalcharge	 =2;//累计充值
+	 optional uint32			starttime	=3;
+	 optional uint32			endtime		=4;
+
+}
+
+message t_rqGetAccuChargeReward
+{
+	optional uint32         id                      =1;
+}
+
+message t_rtSevenDayChargeReward
+{
+	optional uint32         state                   =1;
+	optional uint32		totalcharge		=2;
+	optional uint32		day			=3;
+	optional uint32		starttime		=4;
+	optional uint32		endtime			=5;
+}
+
+message t_rtSetTimeReward
+{
+	optional uint32         state                   =1;
+
+}
+
+message t_SecertCourtRecord
+{
+	optional uint32  	index			=1;
+	optional uint32		itemid			=2;
+	optional uint32		itemnum			=3;
+	optional uint32		curprice		=4;
+	optional uint32		oldprice		=5;
+
+}
+
+message t_HeroShopBatchCmdProto
+{
+	repeated t_SecertCourtRecord    data		=1;
+	optional uint32			needgold	=2;
+	optional uint32			buytimes	=3;
+	optional uint32			moneytype	=4;
+	optional uint32                 maxbuytimes     =5;
+	optional uint32                 leftrefreshtimes =6;
+}
+
+message t_GroceryShopBathCmdProto
+{
+	repeated t_SecertCourtRecord    data		=1;
+	optional uint32			needgold	=2;
+	optional uint32			buytimes	=3;
+	optional uint32			moneytype	=4;
+	optional uint32                 maxbuytimes     =5;
+	optional uint32                 leftrefreshtimes =6;
+
+}
+message t_ArmyShopBathCmdProto
+{
+	repeated t_SecertCourtRecord    data		=1;
+	optional uint32			needgold	=2;
+	optional uint32			buytimes	=3;
+	optional uint32			moneytype	=4;
+	optional uint32                 maxbuytimes     =5;
+	optional uint32                 leftrefreshtimes =6;
+}
+
+message t_BuyShopCmdProto
+{
+	optional uint32			index		=1;
+}
+
+message t_ArenaPlayer
+{
+	optional uint32			charid		=1;
+	optional uint32			rank		=2;
+	optional uint32			lv		=3;
+	optional uint32			reward		=4;
+	optional uint32			power		=5;
+	optional string			name		=6;
+	optional uint32			state		=7;
+	optional string			word		=8;
+	optional uint32			card		=9;
+	repeated t_PetGeneralStructProto      generals	=10;
+}
+
+message t_ArenaInfoProto
+{
+	optional uint32			rank		=1;
+	optional string			word		=2;
+	optional uint32			score		=3;
+	optional uint32			currency	=4;
+	optional uint32			leftTimes	=5;
+	optional uint32			maxTimes	=6;
+	optional uint32			getRewardLeftTime	=7;
+	optional uint32			addTimeGold	=8;
+	optional uint32			buyTimes	=9;
+	optional uint32			maxBuyTimes	=10;
+	repeated uint32		        generals  	=11;
+	optional uint32			worshiptime	=12;
+}
+
+message t_ArenaOpponentsProto
+{
+	repeated t_ArenaPlayer		data		=1;
+}
+
+message t_OperatorArenaPlayerProto
+{
+	optional uint32			rank		=1;
+	optional uint32			charid		=2;
+}
+
+message t_ArenaRankingRecord
+{
+	optional uint32			rank		=1;
+	optional uint32			charid		=2;
+	optional string			name		=3;
+	optional uint32			lv 		=4;
+	optional uint32			power		=5;
+}
+
+message t_ArenaRankingProto
+{
+	repeated t_ArenaRankingRecord	data		=1;
+}
+
+message t_ArenaFightRecord
+{
+	optional uint32			charid		=1;
+	optional string			name		=2;
+	optional uint32			lv		=3;
+	optional uint32			action		=4;
+	optional uint32			delta		=5;
+	optional uint32			time		=6;
+}
+
+message t_ArenaFightTidingsProto
+{
+	repeated t_ArenaFightRecord    data		=1;
+}
+
+message t_AreaShopBathCmdProto
+{
+	repeated t_SecertCourtRecord	data		=1;
+	optional uint32			needgold	=2;
+	optional uint32			buytimes	=3;
+	optional uint32			moneytype	=4;
+	optional uint32			maxbuytimes	=5;
+	optional uint32			leftrefreshtimes =6;
+}
+
+message t_ArenaRankingRewardsPtoro
+{
+	optional uint32		leagueCurrency		=1;
+	optional uint32		leagueMoney		=2;
+	optional uint32		count			=3;
+	optional uint32		maxcount		=4;
+
+}
+
+message t_AreaScoreRewards
+{
+	repeated t_CommonReward		data		=1;
+}
+
+message t_rqGetArenaScoreReward
+{
+	optional uint32			id		=1;
+}
+
+
+message t_ArenaAlterWordProto
+{
+	optional string 		word		=1;
+}
+
+message t_ArenaGeneralSettingProto
+{
+	repeated uint32			generals	=1;
+}
+
+message t_ChallengeArenaPlayerProto
+{
+	optional uint32			rank		=1;
+	optional uint32			charid		=2;
+	optional uint32			result		=3;//挑战结果
+}
+
+
+
+

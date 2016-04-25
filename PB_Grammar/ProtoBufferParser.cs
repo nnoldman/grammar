@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AGrammar;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -8,6 +9,23 @@ using System.Threading.Tasks;
 
 namespace PB_Grammar
 {
+    public class MessageMember
+    {
+        public string condtion;
+        public string type;
+        public string name;
+        public int memberID;
+    }
+    public class Message : IBool
+    {
+        public string typename;
+        public List<MessageMember> members = new List<MessageMember>();
+    }
+    public class GrammarTree
+    {
+        public string packageName;
+        public List<Message> messages = new List<Message>();
+    }
     class ProtoBufferParser
     {
         public class PBTokenType
@@ -21,17 +39,17 @@ namespace PB_Grammar
         }
         static TokenParam[] mStringTokens = new TokenParam[]
         {
-            new TokenParam(){TT= PBTokenType.Comment,Content="//"},
-            new TokenParam(){TT= PBTokenType.Package,Content="package"},
-            new TokenParam(){TT= PBTokenType.Message,Content="message"},
-            new TokenParam(){TT= PBTokenType.TypeName,Content="int32"},
-            new TokenParam(){TT= PBTokenType.TypeName,Content="uint32"},
-            new TokenParam(){TT= PBTokenType.TypeName,Content="string"},
-            new TokenParam(){TT= PBTokenType.TypeName,Content="uint64"},
-            new TokenParam(){TT= PBTokenType.TypeName,Content="bytes"},
-            new TokenParam(){TT= PBTokenType.Option,Content="optional"},
-            new TokenParam(){TT= PBTokenType.Repeated,Content="repeated"},
-            new TokenParam(){TT= PBTokenType.TypeName,Content="int64"},
+            new TokenParam(){TokenType= PBTokenType.Comment,Content="//"},
+            new TokenParam(){TokenType= PBTokenType.Package,Content="package"},
+            new TokenParam(){TokenType= PBTokenType.Message,Content="message"},
+            new TokenParam(){TokenType= PBTokenType.TypeName,Content="int32"},
+            new TokenParam(){TokenType= PBTokenType.TypeName,Content="uint32"},
+            new TokenParam(){TokenType= PBTokenType.TypeName,Content="string"},
+            new TokenParam(){TokenType= PBTokenType.TypeName,Content="uint64"},
+            new TokenParam(){TokenType= PBTokenType.TypeName,Content="bytes"},
+            new TokenParam(){TokenType= PBTokenType.Option,Content="optional"},
+            new TokenParam(){TokenType= PBTokenType.Repeated,Content="repeated"},
+            new TokenParam(){TokenType= PBTokenType.TypeName,Content="int64"},
         };
 
         Grammar mGrammar ;
