@@ -1,5 +1,4 @@
-﻿using AGrammar;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -16,7 +15,7 @@ namespace PB_Grammar
         public string name;
         public int memberID;
     }
-    public class Message : IBool
+    public class Message : BoolObject
     {
         public string typename;
         public List<MessageMember> members = new List<MessageMember>();
@@ -52,11 +51,11 @@ namespace PB_Grammar
             new TokenParam(){TokenType= PBTokenType.TypeName,Content="int64"},
         };
 
-        Grammar mGrammar ;
+        AGrammar mGrammar ;
 
         public bool Load()
         {
-            mGrammar = Grammar.Instance;
+            mGrammar = AGrammar.Instance;
             mGrammar.ErrorHandler = HandleError;
             string content = File.ReadAllText("commondData.proto");
             var res = mGrammar.Parse(mStringTokens, content, LoadPackage);
@@ -76,9 +75,9 @@ namespace PB_Grammar
         {
             int old = mGrammar.Push("package");
             if (!mGrammar.NextTokenIs(old, PBTokenType.Package)) return false;
-            if (!mGrammar.NextTokenIs(old, Scanner.ID)) return false;
+            if (!mGrammar.NextTokenIs(old, AScanner.ID)) return false;
             if (!mGrammar.NextTokenIs(old, ".")) return false;
-            if (!mGrammar.NextTokenIs(old, Scanner.ID)) return false;
+            if (!mGrammar.NextTokenIs(old, AScanner.ID)) return false;
             if (!mGrammar.NextTokenIs(old, ";")) return false;
             if (!mGrammar.NextArrayIs(old, LoadOneMessage)) return false;
             //Pop();
@@ -95,7 +94,7 @@ namespace PB_Grammar
         {
             int old = mGrammar.Push("message");
             if (!mGrammar.NextTokenIs(old, PBTokenType.Message)) return false;
-            if (!mGrammar.NextTokenIs(old, Scanner.ID, "messageName")) return false;
+            if (!mGrammar.NextTokenIs(old, AScanner.ID, "messageName")) return false;
             if (!mGrammar.NextArrayIs(old, LoadOneMember, "{", "}")) return false;
             mGrammar.Pop();
             return true;
@@ -104,7 +103,7 @@ namespace PB_Grammar
         {
             int old = mGrammar.Push("message");
             if (!mGrammar.NextTokenIs(old, PBTokenType.Message)) return false;
-            if (!mGrammar.NextTokenIs(old, Scanner.ID, "messageName")) return false;
+            if (!mGrammar.NextTokenIs(old, AScanner.ID, "messageName")) return false;
             if (!mGrammar.NextArrayIs(old, LoadOneMember, "{", "}")) return false;
             if (!mGrammar.NextTokenIs(old, ";")) return false;//
             mGrammar.Pop();
@@ -116,9 +115,9 @@ namespace PB_Grammar
             int old = mGrammar.Push("member");
             if (!mGrammar.NextTokenIs(old, PBTokenType.Option, "condtion")) return false;
             if (!mGrammar.NextTokenIs(old, PBTokenType.TypeName, "type")) return false;
-            if (!mGrammar.NextTokenIs(old, Scanner.ID, "name")) return false;
+            if (!mGrammar.NextTokenIs(old, AScanner.ID, "name")) return false;
             if (!mGrammar.NextTokenIs(old, "=")) return false;
-            if (!mGrammar.NextTokenIs(old, Scanner.ID, "memberID")) return false;
+            if (!mGrammar.NextTokenIs(old, AScanner.ID, "memberID")) return false;
             if (!mGrammar.NextTokenIs(old, ";")) return false;
             mGrammar.Pop();
             return true;
@@ -127,10 +126,10 @@ namespace PB_Grammar
         {
             int old = mGrammar.Push("member");
             if (!mGrammar.NextTokenIs(old, PBTokenType.Option, "condtion")) return false;
-            if (!mGrammar.NextTokenIs(old, Scanner.ID, "type")) return false;
-            if (!mGrammar.NextTokenIs(old, Scanner.ID, "name")) return false;
+            if (!mGrammar.NextTokenIs(old, AScanner.ID, "type")) return false;
+            if (!mGrammar.NextTokenIs(old, AScanner.ID, "name")) return false;
             if (!mGrammar.NextTokenIs(old, "=")) return false;
-            if (!mGrammar.NextTokenIs(old, Scanner.ID, "memberID")) return false;
+            if (!mGrammar.NextTokenIs(old, AScanner.ID, "memberID")) return false;
             if (!mGrammar.NextTokenIs(old, ";")) return false;
             mGrammar.Pop();
             return true;
@@ -140,9 +139,9 @@ namespace PB_Grammar
             int old = mGrammar.Push("member");
             if (!mGrammar.NextTokenIs(old, PBTokenType.Repeated, "condtion")) return false;
             if (!mGrammar.NextTokenIs(old, PBTokenType.TypeName, "type")) return false;
-            if (!mGrammar.NextTokenIs(old, Scanner.ID, "name")) return false;
+            if (!mGrammar.NextTokenIs(old, AScanner.ID, "name")) return false;
             if (!mGrammar.NextTokenIs(old, "=")) return false;
-            if (!mGrammar.NextTokenIs(old, Scanner.ID, "memberID")) return false;
+            if (!mGrammar.NextTokenIs(old, AScanner.ID, "memberID")) return false;
             if (!mGrammar.NextTokenIs(old, ";")) return false;
             mGrammar.Pop();
             return true;
@@ -151,10 +150,10 @@ namespace PB_Grammar
         {
             int old = mGrammar.Push("member");
             if (!mGrammar.NextTokenIs(old, PBTokenType.Repeated, "condtion")) return false;
-            if (!mGrammar.NextTokenIs(old, Scanner.ID, "type")) return false;
-            if (!mGrammar.NextTokenIs(old, Scanner.ID, "name")) return false;
+            if (!mGrammar.NextTokenIs(old, AScanner.ID, "type")) return false;
+            if (!mGrammar.NextTokenIs(old, AScanner.ID, "name")) return false;
             if (!mGrammar.NextTokenIs(old, "=")) return false;
-            if (!mGrammar.NextTokenIs(old, Scanner.ID, "memberID")) return false;
+            if (!mGrammar.NextTokenIs(old, AScanner.ID, "memberID")) return false;
             if (!mGrammar.NextTokenIs(old, ";")) return false;
             mGrammar.Pop();
             return true;
