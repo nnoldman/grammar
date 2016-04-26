@@ -55,12 +55,22 @@ namespace PB_Grammar
 
         public  void Test()
         {
-            Exp.Add("package").Is(PBTokenType.Package, AScanner.ID, ".", AScanner.ID, ";");
-            Exp.Add("typename").Is(Or.One(PBTokenType.TypeName, AScanner.ID));
-            Exp.Add("condtion").Is(Or.One(PBTokenType.Option, PBTokenType.Repeated));
-            Exp.Add("member").Is(Exp.Get("condtion"),Exp.Get("typename"),AScanner.ID,"=",AScanner.ID,";");
-            Exp.Add("message_body").Is(Or.One(Exp.Get("member").OrArray(), Exp.Empty));
-            Exp.Add("message").Is(PBTokenType.Message, AScanner.ID, "{", Exp.Get("message_body"), "}", Or.One(";", Exp.Empty));
+            Builder.Add("package").Is(PBTokenType.Package, AScanner.ID, ".", AScanner.ID, ";");
+            Builder.Add("typename").Is(Or.One(PBTokenType.TypeName, AScanner.ID));
+            Builder.Add("condtion").Is(Or.One(PBTokenType.Option, PBTokenType.Repeated));
+
+            Builder.Add("member").Is(
+                Builder.Prop("condtion", Builder.Get("condtion"))
+                , Builder.Prop("typename", Builder.Get("typename"))
+                , Builder.Prop("member_name", AScanner.ID)
+                , "="
+                , Builder.Prop("member_id", AScanner.ID)
+                , ";");
+
+            Builder.Add("message_body").Is(Or.One(Builder.Get("member").OrArray(), Exp.Empty));
+            Builder.Add("message").Is(PBTokenType.Message, Builder.Prop("message_name", AScanner.ID), "{", Builder.Get("message_body"), "}", Or.One(";", Exp.Empty));
+
+            //BGrammar.Instance.Parse(Builder.exps, string.Empty, LoadPackage);
         }
         public bool Load()
         {

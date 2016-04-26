@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="AGrammar.cs" />
     <Compile Include="AScanner.cs" />
+    <Compile Include="BGrammar.cs" />
     <Compile Include="Exp.cs" />
   </ItemGroup>
   <ItemGroup>

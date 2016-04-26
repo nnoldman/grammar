@@ -6,3 +6,4 @@ H:\grammer_test\PB_Grammar\bin\Debug\AGrammar.pdb
 H:\grammer_test\PB_Grammar\obj\Debug\PB_Grammar.csprojResolveAssemblyReference.cache
 H:\grammer_test\PB_Grammar\obj\Debug\PB_Grammar.exe
 H:\grammer_test\PB_Grammar\obj\Debug\PB_Grammar.pdb
+H:\grammar\PB_Grammar\obj\Debug\PB_Grammar.csprojResolveAssemblyReference.cache

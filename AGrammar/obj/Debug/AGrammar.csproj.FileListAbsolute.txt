@@ -4,3 +4,7 @@ H:\grammer_test\grammer_test\obj\Debug\AGrammar.Properties.Resources.resources
 H:\grammer_test\grammer_test\obj\Debug\AGrammar.csproj.GenerateResource.Cache
 H:\grammer_test\grammer_test\obj\Debug\AGrammar.dll
 H:\grammer_test\grammer_test\obj\Debug\AGrammar.pdb
+H:\grammar\AGrammar\bin\Debug\AGrammar.dll
+H:\grammar\AGrammar\bin\Debug\AGrammar.pdb
+H:\grammar\AGrammar\obj\Debug\AGrammar.dll
+H:\grammar\AGrammar\obj\Debug\AGrammar.pdb
