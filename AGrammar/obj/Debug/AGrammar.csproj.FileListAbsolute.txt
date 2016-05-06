@@ -8,3 +8,4 @@ H:\grammar\AGrammar\bin\Debug\AGrammar.dll
 H:\grammar\AGrammar\bin\Debug\AGrammar.pdb
 H:\grammar\AGrammar\obj\Debug\AGrammar.dll
 H:\grammar\AGrammar\obj\Debug\AGrammar.pdb
+H:\grammar\AGrammar\obj\Debug\AGrammar.csprojResolveAssemblyReference.cache

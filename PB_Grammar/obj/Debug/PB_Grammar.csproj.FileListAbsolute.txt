@@ -7,3 +7,9 @@ H:\grammer_test\PB_Grammar\obj\Debug\PB_Grammar.csprojResolveAssemblyReference.c
 H:\grammer_test\PB_Grammar\obj\Debug\PB_Grammar.exe
 H:\grammer_test\PB_Grammar\obj\Debug\PB_Grammar.pdb
 H:\grammar\PB_Grammar\obj\Debug\PB_Grammar.csprojResolveAssemblyReference.cache
+H:\grammar\PB_Grammar\bin\Debug\PB_Grammar.exe
+H:\grammar\PB_Grammar\bin\Debug\PB_Grammar.pdb
+H:\grammar\PB_Grammar\bin\Debug\AGrammar.dll
+H:\grammar\PB_Grammar\bin\Debug\AGrammar.pdb
+H:\grammar\PB_Grammar\obj\Debug\PB_Grammar.exe
+H:\grammar\PB_Grammar\obj\Debug\PB_Grammar.pdb

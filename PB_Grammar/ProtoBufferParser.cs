@@ -70,10 +70,11 @@ namespace PB_Grammar
             Builder.Add("message_body").Is(Or.One(Builder.Get("member").OrArray(), Exp.Empty));
             Builder.Add("message").Is(PBTokenType.Message, Builder.Prop("message_name", AScanner.ID), "{", Builder.Get("message_body"), "}", Or.One(";", Exp.Empty));
 
-            //BGrammar.Instance.Parse(Builder.exps, string.Empty, LoadPackage);
+            BGrammar.Instance.Parse(Builder.exps.Values.ToList<Exp>(), string.Empty, LoadPackage);
         }
         public bool Load()
         {
+            Test();
             mGrammar = AGrammar.Instance;
             mGrammar.ErrorHandler = HandleError;
             string content = File.ReadAllText("commondData.proto");
