@@ -1,10 +1,12 @@
-package protobuf.serialize;
 
 message t_GameZoneProto
 {
 	optional uint32 zone		=1;
 	optional uint32	game		=2;
 }
+
+package protobuf.serialize;
+
 message t_NewLoginSessionProto
 {
         optional uint32 wdLoginID       	=1;    

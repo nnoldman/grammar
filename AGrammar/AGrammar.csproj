@@ -40,10 +40,10 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AGrammar.cs" />
-    <Compile Include="AScanner.cs" />
-    <Compile Include="BGrammar.cs" />
-    <Compile Include="Exp.cs" />
+    <Compile Include="Grammar.cs" />
+    <Compile Include="Arg.cs" />
+    <Compile Include="Scanner.cs" />
+    <Compile Include="Segment.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
