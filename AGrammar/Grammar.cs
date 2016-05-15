@@ -16,7 +16,7 @@ namespace AGrammar
     {
         public string propName;
 
-        public virtual void Write(StringBuilder sb, int tabCount)
+        public virtual void WriteTo(StringBuilder sb, int tabCount = 0)
         {
             throw new Exception();
         }
@@ -30,7 +30,7 @@ namespace AGrammar
             return propName + ":" + content;
         }
 
-        public override void Write(StringBuilder sb, int tabCount)
+        public override void WriteTo(StringBuilder sb, int tabCount = 0)
         {
             sb.AppendLine(new string(' ', tabCount) + ToString());
         }
@@ -40,19 +40,19 @@ namespace AGrammar
         public string segType;
         public List<GrammarTreeNode> propertices = new List<GrammarTreeNode>();
 
-        public string space(int tabcount)
+        string Space(int tabcount)
         {
             return new string(' ', tabcount);
         }
-        public override void Write(StringBuilder sb, int tabCount)
+        public override void WriteTo(StringBuilder sb, int tabCount = 0)
         {
-            sb.AppendLine(space(tabCount) + segType);
-            sb.AppendLine(space(tabCount) + '{');
+            sb.AppendLine(Space(tabCount) + segType);
+            sb.AppendLine(Space(tabCount) + '{');
             tabCount += 4;
             foreach (var prop in propertices)
-                prop.Write(sb, tabCount);
+                prop.WriteTo(sb, tabCount);
             tabCount -= 4;
-            sb.AppendLine(space(tabCount) + '}');
+            sb.AppendLine(Space(tabCount) + '}');
         }
 
         public override string ToString()
@@ -71,14 +71,17 @@ namespace AGrammar
         static readonly Type mTypeExp = typeof(Expression);
         static readonly Type mTypeEmpty = typeof(EmptyExp);
 
+        /// <summary>
+        /// Extern token id can not be 0.
+        /// </summary>
         public const int ID = 0;
 
         public Action<string> ErrorHandler;
-        public TokenParam[] TokenParams;
+        public ExternToken[] ExternTokens;
 
         Scanner mScanner;
-        List<GrammarToken> mTokens;
-        public Dictionary<string, Segment> mSegments;
+        List<Token> mTokens;
+        Dictionary<string, Segment> mSegments;
 
         public static EmptyExp Empty
         {
@@ -90,15 +93,15 @@ namespace AGrammar
         public Grammar()
         {
             mScanner = new Scanner();
-            mTokens = new List<GrammarToken>();
+            mTokens = new List<Token>();
             mSegments = new Dictionary<string, Segment>();
         }
-        void Error(string msg)
+        internal void Error(string msg)
         {
             if (ErrorHandler != null)
                 ErrorHandler(msg);
         }
-        void Error(GrammarToken token)
+        internal void Error(Token token)
         {
             Error(string.Format("Load Error:{0}", token.ToString()));
         }
@@ -107,19 +110,29 @@ namespace AGrammar
             if (ErrorHandler != null)
                 mScanner.ErrorHandler = ErrorHandler;
 
-            mTokens = mScanner.Scan(TokenParams, content);
-            GrammarTree tree = new GrammarTree();
-            tree.propName = "grammar";
-            int idx = 0;
-            while (idx < mTokens.Count)
+            mTokens = mScanner.Scan(ExternTokens, content);
+
+            return GenerateTree();
+        }
+        GrammarTree GenerateTree()
+        {
+            GrammarTree root = new GrammarTree();
+
+            root.propName = "grammar";
+
+            for (int i = 0; i < mTokens.Count;)
             {
                 int offset = 0;
-                Segment seg = Parse(idx, ref offset, tree);
-                idx += offset;
+                Segment seg = Parse(i, ref offset, root);
+                if (seg == null)
+                {
+                    Error(mTokens[i + offset].Error());
+                    return null;
+                }
+                i += offset;
             }
-            return tree;
+            return root;
         }
-
         Segment Parse(int idx, ref int offset, GrammarTree parent)
         {
             foreach (var exp in mSegments.Values)
@@ -182,12 +195,14 @@ namespace AGrammar
 
         public Segment Get(string name)
         {
-            return mSegments[name];
+            Segment seg = null;
+            mSegments.TryGetValue(name, out seg);
+            return seg;
         }
 
         string GetContent(int tokenid)
         {
-            foreach (var param in TokenParams)
+            foreach (var param in ExternTokens)
             {
                 if (param.TokenType == tokenid)
                     return param.Content;

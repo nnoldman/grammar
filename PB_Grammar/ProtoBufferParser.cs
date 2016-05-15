@@ -20,35 +20,37 @@ namespace PB_Grammar
             public const int Repeated = 5;
             public const int Comment = 6;
         }
-        static TokenParam[] Tokens = new TokenParam[]
+        static ExternToken[] Tokens = new ExternToken[]
         {
-            new TokenParam(){TokenType= PB.Comment,Content="//"},
-            new TokenParam(){TokenType= PB.Package,Content="package"},
-            new TokenParam(){TokenType= PB.Message,Content="message"},
-            new TokenParam(){TokenType= PB.TypeName,Content="int32"},
-            new TokenParam(){TokenType= PB.TypeName,Content="uint32"},
-            new TokenParam(){TokenType= PB.TypeName,Content="string"},
-            new TokenParam(){TokenType= PB.TypeName,Content="uint64"},
-            new TokenParam(){TokenType= PB.TypeName,Content="bytes"},
-            new TokenParam(){TokenType= PB.Option,Content="optional"},
-            new TokenParam(){TokenType= PB.Repeated,Content="repeated"},
-            new TokenParam(){TokenType= PB.TypeName,Content="int64"},
+            new ExternToken(){TokenType= PB.Comment,Content="//"},
+            new ExternToken(){TokenType= PB.Package,Content="package"},
+            new ExternToken(){TokenType= PB.Message,Content="message"},
+            new ExternToken(){TokenType= PB.TypeName,Content="int32"},
+            new ExternToken(){TokenType= PB.TypeName,Content="uint32"},
+            new ExternToken(){TokenType= PB.TypeName,Content="string"},
+            new ExternToken(){TokenType= PB.TypeName,Content="uint64"},
+            new ExternToken(){TokenType= PB.TypeName,Content="bytes"},
+            new ExternToken(){TokenType= PB.Option,Content="optional"},
+            new ExternToken(){TokenType= PB.Repeated,Content="repeated"},
+            new ExternToken(){TokenType= PB.TypeName,Content="int64"},
         };
         void Loader(Grammar g)
         {
             g.Add("package").Is(PB.Package, Grammar.ID, ".", Grammar.ID, ";");
             g.Add("typename").Is(Arg.One(PB.TypeName, Grammar.ID));
-            g.Add("condtion").Is(Arg.One(PB.Option, PB.Repeated));
-            g.Add("member").Is(Arg.Prop("condtion", g.Get("condtion")), Arg.Prop("typename", g.Get("typename")), Arg.Prop("member_name", Grammar.ID), "=", Arg.Prop("member_id", Grammar.ID), ";");
+            g.Add("condition").Is(Arg.One(PB.Option, PB.Repeated));
+            g.Add("member").Is(Arg.Prop("condition", g.Get("condition")), Arg.Prop("typename", g.Get("typename")), Arg.Prop("member_name", Grammar.ID), "=", Arg.Prop("member_id", Grammar.ID), ";");
             g.Add("message_body").Is(Arg.One(g.Get("member").Array(), Grammar.Empty));
             g.Add("message").Is(PB.Message, Arg.Prop("message_name", Grammar.ID), "{", g.Get("message_body"), "}", Arg.One(";", Grammar.Empty));
         }
         public bool Load()
         {
+            DateTime t0 = DateTime.Now;
+
             Grammar g = new Grammar();
 
             g.ErrorHandler = HandleError;
-            g.TokenParams = Tokens;
+            g.ExternTokens = Tokens;
 
             g.LoadExpression(Loader);
 
@@ -56,16 +58,21 @@ namespace PB_Grammar
 
             var tree = g.Generate(content);
 
+            TimeSpan span = new TimeSpan(DateTime.Now.Ticks - t0.Ticks);
+            Debug.WriteLine(string.Format("Time:{0:00}:{1:00}:{2:00}:{3:00}", span.Hours, span.Minutes, span.Seconds, span.Milliseconds));
+
             OutPut(tree);
 
             return true;
         }
         void OutPut(GrammarTree tree)
         {
+            if (!tree)
+                return;
             StringBuilder sb = new StringBuilder();
-            tree.Write(sb, 0);
+            tree.WriteTo(sb);
             File.WriteAllBytes("cmdxxx.lua", new UTF8Encoding(false).GetBytes(sb.ToString().ToCharArray()));
-            Console.Write(sb.ToString());
+            //Debug.Write(sb.ToString());
         }
         void HandleError(string msg)
         {

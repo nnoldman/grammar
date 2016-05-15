@@ -14,7 +14,6 @@ namespace AGrammar
             arg.args = args;
             return arg;
         }
-
         public static ArgProp Prop(string propName, Segment exp)
         {
             ArgProp arg = new ArgProp();
@@ -42,12 +41,18 @@ namespace AGrammar
         public class ArgOr : Arg
         {
             public object[] args;
+            internal ArgOr()
+            {
+            }
         }
 
         public class ArgProp : Arg
         {
             public string propName;
             public Expression exp;
+            internal ArgProp()
+            {
+            }
         }
     }
 }
