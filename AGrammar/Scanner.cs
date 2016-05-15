@@ -4,51 +4,52 @@ using System.Linq;
 using System.Text;
 namespace AGrammar
 {
-
-    public class TokenParam
+    public class ExternToken
     {
         public int TokenType;
         public string Content;
     }
-    public class GrammarToken
+    internal class Token
     {
         public int TokenType;
         public string Content;
-        public int line;
-        public int indexOnLine;
-        public int index;
+        public int Line;
+        public int Column;
 
-        public GrammarToken() { }
-        public GrammarToken(int tt, string content, int line, int indexOnLine)
+        public Token()
+        {
+        }
+        public Token(int tt, string content, int line, int indexOnLine)
         {
             this.TokenType = tt;
             this.Content = content;
-            this.line = line;
-            this.indexOnLine = indexOnLine;
+            this.Line = line;
+            this.Column = indexOnLine;
         }
         public override string ToString()
         {
             return string.Format("{0} [{1}]", Content);
         }
+        public string Error()
+        {
+            return string.Format("Line:{0},Col:{1},Content:{2}", Line, Column, Content);
+        }
     }
 
-    public class Scanner
+    internal class Scanner
     {
         public Action<string> ErrorHandler;
 
-        Dictionary<string, TokenParam> mTokenMap = new Dictionary<string, TokenParam>();
+        Dictionary<string, ExternToken> mTokenMap = new Dictionary<string, ExternToken>();
+
         void Error(string msg)
         {
             if (ErrorHandler != null)
                 ErrorHandler(msg);
         }
-        public void ClearTokenMap()
+        public bool Init(ExternToken[] tokens)
         {
             mTokenMap.Clear();
-        }
-        public bool Init(TokenParam[] tokens)
-        {
-            ClearTokenMap();
 
             foreach (var item in tokens)
             {
@@ -69,23 +70,22 @@ namespace AGrammar
             }
             return false;
         }
-        public List<GrammarToken> Scan(TokenParam[] tokenParams, string content)
+        public List<Token> Scan(ExternToken[] tokenParams, string content)
         {
             if (!Init(tokenParams))
                 return null;
 
             content = content.Replace("\r\n", "\n");
 
-            List<GrammarToken> tokens = new List<GrammarToken>();
+            List<Token> tokens = new List<Token>();
             int line = 1;
             int len = content.Length;
             int indexOnLine = 1;
             int lineStartIndex = 0;
             bool commenting = false;
 
-
-
             StringBuilder sb = new StringBuilder();
+
             for (int i = 0; i < len; ++i, ++indexOnLine)
             {
                 char ch = content[i];
@@ -99,8 +99,8 @@ namespace AGrammar
                                 {
                                     if (sb.Length > 0)
                                     {
-                                        int tp = GetStringTokenType(sb.ToString());
-                                        GrammarToken t = new GrammarToken(tp, sb.ToString(), line, indexOnLine - sb.Length);
+                                        int tp = GetTokenType(sb.ToString());
+                                        Token t = new Token(tp, sb.ToString(), line, indexOnLine - sb.Length);
                                         tokens.Add(t);
                                         sb.Clear();
                                     }
@@ -113,8 +113,8 @@ namespace AGrammar
                                 commenting = false;
                                 if (sb.Length > 0)
                                 {
-                                    int tp = GetStringTokenType(sb.ToString());
-                                    GrammarToken t = new GrammarToken(tp, sb.ToString(), line, indexOnLine - sb.Length);
+                                    int tp = GetTokenType(sb.ToString());
+                                    Token t = new Token(tp, sb.ToString(), line, indexOnLine - sb.Length);
                                     tokens.Add(t);
                                     sb.Clear();
                                 }
@@ -134,18 +134,18 @@ namespace AGrammar
                             {
                                 if (sb.Length > 0)
                                 {
-                                    int tp = GetStringTokenType(sb.ToString());
-                                    GrammarToken t = new GrammarToken(tp, sb.ToString(), line, indexOnLine - sb.Length);
+                                    int tp = GetTokenType(sb.ToString());
+                                    Token t = new Token(tp, sb.ToString(), line, indexOnLine - sb.Length);
                                     tokens.Add(t);
                                     sb.Clear();
                                 }
                                 if (ch != ' ' && ch != '\t')
                                 {
-                                    GrammarToken t = new GrammarToken();
-                                    t.TokenType = 0;
+                                    Token t = new Token();
+                                    t.TokenType = -1;
                                     t.Content = new string(ch, 1);
-                                    t.line = line;
-                                    t.indexOnLine = indexOnLine;
+                                    t.Line = line;
+                                    t.Column = indexOnLine;
                                     tokens.Add(t);
                                 }
                             }
@@ -161,40 +161,11 @@ namespace AGrammar
             return tokens;
         }
 
-        private int GetStringTokenType(string lex)
+        private int GetTokenType(string lex)
         {
-            TokenParam result = null;
+            ExternToken result = null;
             mTokenMap.TryGetValue(lex, out result);
-            if (result == null)
-            {
-                return 0;
-            }
-            return result.TokenType;
-        }
-
-        private static bool isStr(string lex)
-        {
-            if (lex.ElementAt(0) != '\"' || lex.ElementAt(lex.Length - 1) != '\"')
-                return false;
-            for (int i = 1; i <= lex.Length - 2; i++)
-            {
-                if (lex.ElementAt(i) == '\"')
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
-        private static bool isNumber(string str)
-        {
-            for (int i = 0; i < str.Length; ++i)
-            {
-                if (str[i] < '0')
-                    return false;
-                if (str[i] > '9')
-                    return false;
-            }
-            return true;
+            return result == null ? 0 : result.TokenType;
         }
     }
 }
