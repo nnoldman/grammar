@@ -2,3 +2,4 @@
 *.Cache
 *.config
 *.suo
+/Visual Studio 2012
