@@ -36,12 +36,12 @@ namespace PB_Grammar
         };
         void Loader(Grammar g)
         {
-            g.Add("package").Is(TokenID.Package, Grammar.ID, ".", Grammar.ID, ";");
-            g.Add("typename").Is(Arg.One(TokenID.TypeName, Grammar.ID));
-            g.Add("condition").Is(Arg.One(TokenID.Option, TokenID.Repeated));
-            g.Add("member").Is(Arg.Prop("condition", g.Get("condition")), Arg.Prop("typename", g.Get("typename")), Arg.Prop("member_name", Grammar.ID), "=", Arg.Prop("member_id", Grammar.ID), ";");
-            g.Add("message_body").Is(Arg.One(g.Get("member").Array(), Grammar.Empty));
-            g.Add("message").Is(TokenID.Message, Arg.Prop("message_name", Grammar.ID), "{", g.Get("message_body"), "}", Arg.One(";", Grammar.Empty));
+        //    g.AddAnd("package").Is(TokenID.Package, Grammar.ID, ".", Grammar.ID, ";");
+        //    g.AddOr("typename").IsOneOf(Arg.One(TokenID.TypeName, Grammar.ID));
+        //    g.AddOr("condition").IsOneOf(Arg.One(TokenID.Option, TokenID.Repeated));
+        //    g.AddAnd("member").Is(Arg.Prop("condition", g.Get("condition")), Arg.Prop("typename", g.Get("typename")), Arg.Prop("member_name", Grammar.ID), "=", Arg.Prop("member_id", Grammar.ID), ";");
+        //    g.AddOr("message_body").IsOneOf(Arg.One(g.Get("member").Array(), Grammar.Empty));
+        //    g.AddAnd("message").Is(TokenID.Message, Arg.Prop("message_name", Grammar.ID), "{", g.Get("message_body"), "}", Arg.One(";", Grammar.Empty));
         }
         public bool Load()
         {

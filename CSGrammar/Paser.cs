@@ -62,20 +62,20 @@ namespace CSGrammar
             new ExternToken(){TokenType= TokenID.InnerType,Content="long"},
             new ExternToken(){TokenType= TokenID.InnerType,Content="ulong"},
         };
+
+        //g.Add("class_func").Is();
+        //g.Add("class_mem").Is(Arg.One(g.Get("class_mem_non_init")));
+        //g.Add("class_body").Is(Arg.One(g.Get("class_func").Array(), g.Get("class_mem_non_init").Array()));
         void Loader(Grammar g)
         {
-            //g.Add("class_func").Is();
+            g.Or("permission").IsOneOf(TokenID.Permission, Grammar.Empty);
+            g.Or("memory").IsOneOf(TokenID.Memory, Grammar.Empty);
+            g.Or("type").IsOneOf(TokenID.InnerType, Grammar.ID);
 
-            g.Add("class_mem_non_init").Is(Arg.One(TokenID.Permission, Grammar.Empty)
-                , Arg.One(TokenID.Memory, Grammar.Empty)
-                , Arg.One(TokenID.InnerType, Grammar.ID)
-                , Arg.Prop("mem_name", Grammar.ID)
-                , ";");
+            g.And("class_mem_non_init").Is("<permission>", "<memory>", "<type>", Arg.Prop("mem_name", Grammar.ID), ";").Array();
+            g.Or("class_body").IsOneOf("<class_mem_non_init>", Grammar.Empty);
 
-            //g.Add("class_mem").Is(Arg.One(g.Get("class_mem_non_init")));
-            //g.Add("class_body").Is(Arg.One(g.Get("class_func").Array(), g.Get("class_mem_non_init").Array()));
-            g.Add("class_body").Is(g.Get("class_mem_non_init").Array());
-            g.Add("class").Is(Arg.One(TokenID.Permission, Grammar.Empty), TokenID.Class, Arg.Prop("class_name", Grammar.ID), "{", g.Get("class_body"), "}");
+            g.SecAnd("class").Is("<permission>", TokenID.Class, Arg.Prop("class_name", Grammar.ID), "{", "<class_body>", "}");
         }
         public GrammarTree Load(Action<string> errorHandler, string content)
         {

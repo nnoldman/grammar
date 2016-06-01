@@ -67,9 +67,9 @@ namespace AGrammar
         static readonly Type mTypeInt = typeof(int);
         static readonly Type mTypeProperty = typeof(Arg.ArgProp);
         static readonly Type mTypeOr = typeof(Arg.ArgOr);
-        static readonly Type mTypeSeg = typeof(Segment);
+        static readonly Type mTypeSeg = typeof(AndExpression);
         static readonly Type mTypeExp = typeof(Expression);
-        static readonly Type mTypeEmpty = typeof(EmptyExp);
+        static readonly Type mTypeEmpty = typeof(EmptyExpression);
 
         /// <summary>
         /// Extern token id can not be 0.
@@ -81,20 +81,22 @@ namespace AGrammar
 
         Scanner mScanner;
         List<Token> mTokens;
-        Dictionary<string, Segment> mSegments;
+        Dictionary<string, CompositeExpression> mSegments;
+        Dictionary<string, CompositeExpression> mSections;
 
-        public static EmptyExp Empty
+        public static EmptyExpression Empty
         {
             get
             {
-                return new EmptyExp();
+                return new EmptyExpression();
             }
         }
         public Grammar()
         {
             mScanner = new Scanner();
             mTokens = new List<Token>();
-            mSegments = new Dictionary<string, Segment>();
+            mSegments = new Dictionary<string, CompositeExpression>();
+            mSections = new Dictionary<string, CompositeExpression>();
         }
         internal void Error(string msg)
         {
@@ -123,7 +125,7 @@ namespace AGrammar
             for (int i = 0; i < mTokens.Count;)
             {
                 int offset = 0;
-                Segment seg = Parse(i, ref offset, root);
+                CompositeExpression seg = Parse(i, ref offset, root);
                 if (seg == null)
                 {
                     Error(mTokens[i + offset].Error());
@@ -133,32 +135,69 @@ namespace AGrammar
             }
             return root;
         }
-        Segment Parse(int idx, ref int offset, GrammarTree parent)
+        CompositeExpression Parse(int idx, ref int offset, GrammarTree parent)
         {
-            foreach (var exp in mSegments.Values)
+            foreach (var exp in this.mSections.Values)
             {
                 if (exp.Match(ref mTokens, idx, ref offset, parent, string.Empty))
                     return exp;
             }
             return null;
         }
-
-        public Segment Add(string name)
+        /// <summary>
+        /// add section
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        internal T Sec<T>(string name) where T : CompositeExpression, new()
         {
-            return TryGetAndCreate(name);
+            T seg = TryGetAndCreate<T>(name);
+            if (seg)
+            {
+                mSections.Add(name, seg);
+            }
+            return (T)seg;
         }
-        Segment TryGetAndCreate(string name)
+
+        public OrExpression SecOr(string name)
         {
-            Segment exp;
+            return Sec<OrExpression>(name);
+        }
+        public AndExpression SecAnd(string name)
+        {
+            return Sec<AndExpression>(name);
+        }
+        /// <summary>
+        /// add or exp
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public OrExpression Or(string name)
+        {
+            return TryGetAndCreate<OrExpression>(name);
+        }
+        /// <summary>
+        /// add and exp
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public AndExpression And(string name)
+        {
+            return TryGetAndCreate<AndExpression>(name);
+        }
+        T TryGetAndCreate<T>(string name) where T : CompositeExpression, new()
+        {
+            CompositeExpression exp;
             if (!mSegments.TryGetValue(name, out exp))
             {
-                exp = new Segment(name);
+                exp = new T();
+                exp.name = name;
                 exp.grammar = this;
                 mSegments.Add(name, exp);
             }
-            return exp;
+            return (T)exp;
         }
-        internal Expression Create(object arg, Segment parent)
+        internal Expression Create(object arg, CompositeExpression parent)
         {
             var tp = arg.GetType();
 
@@ -181,21 +220,21 @@ namespace AGrammar
             else if (tp == mTypeSeg)
             {
                 if (parent)
-                    parent.AddChildren((Segment)arg);
-                return (Segment)arg;
+                    parent.AddChildren((AndExpression)arg);
+                return (AndExpression)arg;
             }
             else if (tp == mTypeEmpty)
             {
                 if (parent)
-                    parent.AddChildren((EmptyExp)arg);
-                return (EmptyExp)arg;
+                    parent.AddChildren((EmptyExpression)arg);
+                return (EmptyExpression)arg;
             }
             throw new Exception();
         }
 
-        public Segment Get(string name)
+        public CompositeExpression Get(string name)
         {
-            Segment seg = null;
+            CompositeExpression seg = null;
             mSegments.TryGetValue(name, out seg);
             return seg;
         }
@@ -217,22 +256,22 @@ namespace AGrammar
         }
         void CloseLexer()
         {
-            foreach (var seg in mSegments)
+            foreach (var seg in mSections)
             {
-                seg.Value.Process();
+                seg.Value.SetNext();
             }
         }
 
-        Expression Create(int arg, Segment parent)
+        Expression Create(int arg, AndExpression parent)
         {
             Expression exp = new Expression();
             exp.tokenType = arg;
-            exp.content = GetContent(arg);
+            //exp.content = GetContent(arg);
             if (parent)
                 parent.AddChildren(exp);
             return exp;
         }
-        static Expression Create(string arg, Segment parent)
+        static Expression Create(string arg, AndExpression parent)
         {
             Expression exp = new Expression();
             exp.content = arg;
@@ -241,7 +280,7 @@ namespace AGrammar
             return exp;
         }
 
-        static PropExpression Create(Arg.ArgProp arg, Segment parent)
+        static PropExpression Create(Arg.ArgProp arg, AndExpression parent)
         {
             PropExpression exp = new PropExpression(arg.propName, parent.name);
             exp.executer = arg.exp;
@@ -250,14 +289,14 @@ namespace AGrammar
                 parent.AddChildren(exp);
             return exp;
         }
-        Expression Create(Arg.ArgOr arg, Segment parent)
+        Expression Create(Arg.ArgOr arg, AndExpression parent)
         {
             OrExpression or = new OrExpression();
             parent.AddChildren(or);
             foreach (var orarg in arg.args)
             {
                 Expression exp = Create(orarg, null);
-                or.sublings.Add(exp);
+                or.children.Add(exp);
             }
             return or;
         }

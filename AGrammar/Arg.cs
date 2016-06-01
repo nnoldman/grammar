@@ -14,7 +14,7 @@ namespace AGrammar
             arg.args = args;
             return arg;
         }
-        public static ArgProp Prop(string propName, Segment exp)
+        public static ArgProp Prop(string propName, AndExpression exp)
         {
             ArgProp arg = new ArgProp();
             arg.propName = propName;
