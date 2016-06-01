@@ -11,7 +11,7 @@ namespace PB_Grammar
 {
     class ProtoBufferParser
     {
-        public class PB
+        public class TokenID
         {
             public const int Package = 1;
             public const int Message = 2;
@@ -22,26 +22,26 @@ namespace PB_Grammar
         }
         static ExternToken[] Tokens = new ExternToken[]
         {
-            new ExternToken(){TokenType= PB.Comment,Content="//"},
-            new ExternToken(){TokenType= PB.Package,Content="package"},
-            new ExternToken(){TokenType= PB.Message,Content="message"},
-            new ExternToken(){TokenType= PB.TypeName,Content="int32"},
-            new ExternToken(){TokenType= PB.TypeName,Content="uint32"},
-            new ExternToken(){TokenType= PB.TypeName,Content="string"},
-            new ExternToken(){TokenType= PB.TypeName,Content="uint64"},
-            new ExternToken(){TokenType= PB.TypeName,Content="bytes"},
-            new ExternToken(){TokenType= PB.Option,Content="optional"},
-            new ExternToken(){TokenType= PB.Repeated,Content="repeated"},
-            new ExternToken(){TokenType= PB.TypeName,Content="int64"},
+            new ExternToken(){TokenType= TokenID.Comment,Content="//"},
+            new ExternToken(){TokenType= TokenID.Package,Content="package"},
+            new ExternToken(){TokenType= TokenID.Message,Content="message"},
+            new ExternToken(){TokenType= TokenID.TypeName,Content="int32"},
+            new ExternToken(){TokenType= TokenID.TypeName,Content="uint32"},
+            new ExternToken(){TokenType= TokenID.TypeName,Content="string"},
+            new ExternToken(){TokenType= TokenID.TypeName,Content="uint64"},
+            new ExternToken(){TokenType= TokenID.TypeName,Content="bytes"},
+            new ExternToken(){TokenType= TokenID.Option,Content="optional"},
+            new ExternToken(){TokenType= TokenID.Repeated,Content="repeated"},
+            new ExternToken(){TokenType= TokenID.TypeName,Content="int64"},
         };
         void Loader(Grammar g)
         {
-            g.Add("package").Is(PB.Package, Grammar.ID, ".", Grammar.ID, ";");
-            g.Add("typename").Is(Arg.One(PB.TypeName, Grammar.ID));
-            g.Add("condition").Is(Arg.One(PB.Option, PB.Repeated));
+            g.Add("package").Is(TokenID.Package, Grammar.ID, ".", Grammar.ID, ";");
+            g.Add("typename").Is(Arg.One(TokenID.TypeName, Grammar.ID));
+            g.Add("condition").Is(Arg.One(TokenID.Option, TokenID.Repeated));
             g.Add("member").Is(Arg.Prop("condition", g.Get("condition")), Arg.Prop("typename", g.Get("typename")), Arg.Prop("member_name", Grammar.ID), "=", Arg.Prop("member_id", Grammar.ID), ";");
             g.Add("message_body").Is(Arg.One(g.Get("member").Array(), Grammar.Empty));
-            g.Add("message").Is(PB.Message, Arg.Prop("message_name", Grammar.ID), "{", g.Get("message_body"), "}", Arg.One(";", Grammar.Empty));
+            g.Add("message").Is(TokenID.Message, Arg.Prop("message_name", Grammar.ID), "{", g.Get("message_body"), "}", Arg.One(";", Grammar.Empty));
         }
         public bool Load()
         {

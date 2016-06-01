@@ -1,0 +1,4 @@
+D:\src\grammar\AGrammer\bin\Debug\AGrammer.dll
+D:\src\grammar\AGrammer\bin\Debug\AGrammer.pdb
+D:\src\grammar\AGrammer\obj\Debug\AGrammer.dll
+D:\src\grammar\AGrammer\obj\Debug\AGrammer.pdb

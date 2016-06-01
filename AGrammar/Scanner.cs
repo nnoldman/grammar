@@ -8,6 +8,11 @@ namespace AGrammar
     {
         public int TokenType;
         public string Content;
+
+        public override string ToString()
+        {
+            return string.Format("<{0}>{1}", TokenType, Content);
+        }
     }
     internal class Token
     {
@@ -28,7 +33,7 @@ namespace AGrammar
         }
         public override string ToString()
         {
-            return string.Format("{0} [{1}]", Content);
+            return string.Format("{0} [{1}]", TokenType, Content);
         }
         public string Error()
         {
