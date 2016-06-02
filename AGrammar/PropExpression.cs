@@ -30,5 +30,31 @@ namespace AGrammar
         {
             return parentName + "." + propertyName;
         }
+
+        internal override bool FastMatch(int start, ref int offset, ref List<Token> tokens)
+        {
+            if (executer.FastMatch(start, ref offset, ref tokens))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public override Expression Copy()
+        {
+            PropExpression exp = new PropExpression(this.propertyName, this.parentName);
+            exp.tokenType = this.tokenType;
+            exp.content = this.content;
+            exp.countType = this.countType;
+            exp.grammar = this.grammar;
+            exp.executer = this.executer.Copy();
+            return exp;
+        }
+
+        internal override void SetNext()
+        {
+            if (this.next)
+                this.executer.next = this.next;
+        }
     }
 }

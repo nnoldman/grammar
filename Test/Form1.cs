@@ -16,7 +16,7 @@ namespace Test
         {
             InitializeComponent();
 
-            Tester.TestCSGrammar();
+
         }
 
         private void Form1_Load(object sender, EventArgs e)

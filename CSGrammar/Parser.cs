@@ -9,11 +9,9 @@ using System.Threading.Tasks;
 
 namespace CSGrammar
 {
-    public class Paser
+    public class Parser
     {
         Grammar g = new Grammar();
-        bool mInit = false;
-        GrammarTree mTree;
 
         public class TokenID
         {
@@ -63,44 +61,33 @@ namespace CSGrammar
             new ExternToken(){TokenType= TokenID.InnerType,Content="ulong"},
         };
 
-        //g.Add("class_func").Is();
-        //g.Add("class_mem").Is(Arg.One(g.Get("class_mem_non_init")));
-        //g.Add("class_body").Is(Arg.One(g.Get("class_func").Array(), g.Get("class_mem_non_init").Array()));
         void Loader(Grammar g)
         {
             g.Or("permission").IsOneOf(TokenID.Permission, Grammar.Empty);
             g.Or("memory").IsOneOf(TokenID.Memory, Grammar.Empty);
             g.Or("type").IsOneOf(TokenID.InnerType, Grammar.ID);
 
-            g.And("class_mem_non_init").Is("<permission>", "<memory>", "<type>", Arg.Prop("mem_name", Grammar.ID), ";").Array();
-            g.Or("class_body").IsOneOf("<class_mem_non_init>", Grammar.Empty);
+            g.Or("arg_ter").IsOneOf(",", Grammar.Empty);
+            g.And("arg").Is(Arg.Prop("type", "<type>"), Arg.Prop("name", Grammar.ID), "<arg_ter>");
+            g.Or("args").IsOneOf("<arg>", Grammar.Empty).Array();
 
-            g.SecAnd("class").Is("<permission>", TokenID.Class, Arg.Prop("class_name", Grammar.ID), "{", "<class_body>", "}");
-        }
-        public GrammarTree Load(Action<string> errorHandler, string content)
-        {
-            if (!mInit)
-            {
-                g.ExternTokens = Tokens;
-                g.ErrorHandler = errorHandler;
-                g.LoadExpression(Loader);
-                mInit = true;
-            }
+            g.And("fun").Is("<permission>", "<memory>", Arg.Prop("ret", "<type>"), Arg.Prop("name", Grammar.ID), "(", "<args>", ")", "{", "}");
+            g.And("member1").Is("<permission>", "<memory>", Arg.Prop("type", "<type>"), Arg.Prop("name", Grammar.ID), ";");
+            g.Or("class_body").IsOneOf("<member1>", "<fun>", Grammar.Empty).Array();
 
-            DateTime t0 = DateTime.Now;
-            mTree = g.Generate(content);
-            TimeSpan span = new TimeSpan(DateTime.Now.Ticks - t0.Ticks);
-            Debug.WriteLine(string.Format("Time:{0:00}:{1:00}:{2:00}:{3:00}", span.Hours, span.Minutes, span.Seconds, span.Milliseconds));
-            return mTree;
+            g.And("class").Is("<permission>", TokenID.Class, Arg.Prop("name", Grammar.ID), "{", "<class_body>", "}");
+            g.SecOr("grammar").IsOneOf("<class>", Grammar.Empty).Array();
         }
 
-        public void OutPut(string fileName)
+        public GrammarTree Load(Action<string> messageHandler, string content)
         {
-            if (!mTree)
-                return;
-            StringBuilder sb = new StringBuilder();
-            mTree.WriteTo(sb);
-            File.WriteAllBytes(fileName, new UTF8Encoding(false).GetBytes(sb.ToString().ToCharArray()));
+            return g.Generate(content, Tokens, messageHandler, Loader);
+        }
+
+        public void Dump(string file)
+        {
+            if (g.Tree)
+                File.WriteAllBytes(file, g.OutPutDebug());
         }
     }
 }

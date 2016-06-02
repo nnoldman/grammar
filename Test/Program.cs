@@ -14,9 +14,12 @@ namespace Test
         [STAThread]
         static void Main()
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+            //Application.EnableVisualStyles();
+            //Application.SetCompatibleTextRenderingDefault(false);
+            //Application.Run(new Form1());
+
+            Tester.TestCSGrammar();
+            Tester.TestPBGrammar();
         }
     }
 }

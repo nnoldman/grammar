@@ -8,13 +8,7 @@ namespace AGrammar
 {
     public class Arg
     {
-        public static ArgOr One(params object[] args)
-        {
-            ArgOr arg = new ArgOr();
-            arg.args = args;
-            return arg;
-        }
-        public static ArgProp Prop(string propName, AndExpression exp)
+        public static ArgProp Prop(string propName, CompositeExpression exp)
         {
             ArgProp arg = new ArgProp();
             arg.propName = propName;
@@ -25,31 +19,21 @@ namespace AGrammar
         {
             ArgProp arg = new ArgProp();
             arg.propName = propName;
-            arg.exp = new Expression();
-            arg.exp.tokenType = tokenID;
+            arg.exp = tokenID;
             return arg;
         }
         public static ArgProp Prop(string propName, string content)
         {
             ArgProp arg = new ArgProp();
             arg.propName = propName;
-            arg.exp = new Expression();
-            arg.exp.content = content;
+            arg.exp= content;
             return arg;
-        }
-
-        public class ArgOr : Arg
-        {
-            public object[] args;
-            internal ArgOr()
-            {
-            }
         }
 
         public class ArgProp : Arg
         {
             public string propName;
-            public Expression exp;
+            public object exp;
             internal ArgProp()
             {
             }

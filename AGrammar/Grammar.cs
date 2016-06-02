@@ -1,72 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 namespace AGrammar
 {
-    public class BoolObject
-    {
-        public static implicit operator bool(BoolObject obj)
-        {
-            return obj != null;
-        }
-    }
-    public class GrammarTreeNode : BoolObject
-    {
-        public string propName;
-
-        public virtual void WriteTo(StringBuilder sb, int tabCount = 0)
-        {
-            throw new Exception();
-        }
-    }
-    public class PropertyTreeNode : GrammarTreeNode
-    {
-        public string content;
-
-        public override string ToString()
-        {
-            return propName + ":" + content;
-        }
-
-        public override void WriteTo(StringBuilder sb, int tabCount = 0)
-        {
-            sb.AppendLine(new string(' ', tabCount) + ToString());
-        }
-    }
-    public class GrammarTree : GrammarTreeNode
-    {
-        public string segType;
-        public List<GrammarTreeNode> propertices = new List<GrammarTreeNode>();
-
-        string Space(int tabcount)
-        {
-            return new string(' ', tabcount);
-        }
-        public override void WriteTo(StringBuilder sb, int tabCount = 0)
-        {
-            sb.AppendLine(Space(tabCount) + segType);
-            sb.AppendLine(Space(tabCount) + '{');
-            tabCount += 4;
-            foreach (var prop in propertices)
-                prop.WriteTo(sb, tabCount);
-            tabCount -= 4;
-            sb.AppendLine(Space(tabCount) + '}');
-        }
-
-        public override string ToString()
-        {
-            return segType;
-        }
-    }
-
     public class Grammar
     {
         static readonly Type mTypeString = typeof(string);
         static readonly Type mTypeInt = typeof(int);
         static readonly Type mTypeProperty = typeof(Arg.ArgProp);
-        static readonly Type mTypeOr = typeof(Arg.ArgOr);
         static readonly Type mTypeSeg = typeof(AndExpression);
         static readonly Type mTypeExp = typeof(Expression);
         static readonly Type mTypeEmpty = typeof(EmptyExpression);
@@ -76,13 +20,14 @@ namespace AGrammar
         /// </summary>
         public const int ID = 0;
 
-        public Action<string> ErrorHandler;
-        public ExternToken[] ExternTokens;
+        Action<string> mMessageHandler;
+        ExternToken[] mExternTokens;
 
         Scanner mScanner;
         List<Token> mTokens;
         Dictionary<string, CompositeExpression> mSegments;
         Dictionary<string, CompositeExpression> mSections;
+        GrammarTree mTree = new GrammarTree();
 
         public static EmptyExpression Empty
         {
@@ -98,34 +43,63 @@ namespace AGrammar
             mSegments = new Dictionary<string, CompositeExpression>();
             mSections = new Dictionary<string, CompositeExpression>();
         }
+        public GrammarTree Tree
+        {
+            get
+            {
+                return mTree;
+            }
+        }
         internal void Error(string msg)
         {
-            if (ErrorHandler != null)
-                ErrorHandler(msg);
+            if (mMessageHandler != null)
+                mMessageHandler(msg);
         }
         internal void Error(Token token)
         {
             Error(string.Format("Load Error:{0}", token.ToString()));
         }
-        public GrammarTree Generate(string content)
+
+        public byte[] OutPutDebug()
         {
-            if (ErrorHandler != null)
-                mScanner.ErrorHandler = ErrorHandler;
+            if (!mTree)
+                return null;
+            StringBuilder sb = new StringBuilder();
+            this.mTree.WriteTo(sb);
+            return new UTF8Encoding(false).GetBytes(sb.ToString().ToCharArray());
+        }
+        public GrammarTree Generate(string content, ExternToken[] tokens, Action<string> handler,Action<Grammar> loader)
+        {
+            if (loader == null)
+                return null;
 
-            mTokens = mScanner.Scan(ExternTokens, content);
+            this.mExternTokens = tokens;
+            this.mMessageHandler = handler;
+            this.mScanner.ErrorHandler = handler;
 
-            return GenerateTree();
+            LoadExpressions(loader);
+
+            DateTime t0 = DateTime.Now;
+
+            mTokens = mScanner.Scan(mExternTokens, content);
+            mTree = GenerateTree();
+
+            TimeSpan span = new TimeSpan(DateTime.Now.Ticks - t0.Ticks);
+
+            if (mMessageHandler != null)
+                mMessageHandler(string.Format("Time:{0:00}:{1:00}:{2:00}:{3:00}", span.Hours, span.Minutes, span.Seconds, span.Milliseconds));
+            
+            return mTree;
         }
         GrammarTree GenerateTree()
         {
-            GrammarTree root = new GrammarTree();
-
-            root.propName = "grammar";
+            GrammarTree tree = new GrammarTree();
+            tree.propName = "grammar";
 
             for (int i = 0; i < mTokens.Count;)
             {
                 int offset = 0;
-                CompositeExpression seg = Parse(i, ref offset, root);
+                CompositeExpression seg = Parse(i, ref offset, tree);
                 if (seg == null)
                 {
                     Error(mTokens[i + offset].Error());
@@ -133,7 +107,7 @@ namespace AGrammar
                 }
                 i += offset;
             }
-            return root;
+            return tree;
         }
         CompositeExpression Parse(int idx, ref int offset, GrammarTree parent)
         {
@@ -213,10 +187,6 @@ namespace AGrammar
             {
                 return Create((Arg.ArgProp)arg, parent);
             }
-            else if (tp == mTypeOr)
-            {
-                return Create((Arg.ArgOr)arg, parent);
-            }
             else if (tp == mTypeSeg)
             {
                 if (parent)
@@ -241,28 +211,23 @@ namespace AGrammar
 
         string GetContent(int tokenid)
         {
-            foreach (var param in ExternTokens)
+            foreach (var param in mExternTokens)
             {
                 if (param.TokenType == tokenid)
                     return param.Content;
             }
             return string.Empty;
         }
-        public void LoadExpression(Action<Grammar> loader)
+        void LoadExpressions(Action<Grammar> loader)
         {
-            if (loader != null)
+            if (mSections.Count == 0 && loader != null)
                 loader(this);
-            CloseLexer();
-        }
-        void CloseLexer()
-        {
+
             foreach (var seg in mSections)
-            {
                 seg.Value.SetNext();
-            }
         }
 
-        Expression Create(int arg, AndExpression parent)
+        Expression Create(int arg, CompositeExpression parent)
         {
             Expression exp = new Expression();
             exp.tokenType = arg;
@@ -271,8 +236,36 @@ namespace AGrammar
                 parent.AddChildren(exp);
             return exp;
         }
-        static Expression Create(string arg, AndExpression parent)
+
+        static string RightBrack = new string('>', 1);
+
+        static bool IsCompositeExpression(string name)
         {
+            return name.IndexOf('<') == 0 && name.EndsWith(RightBrack);
+        }
+        static string GetCompositeExpName(string rawName)
+        {
+            return rawName.Substring(1, rawName.Length - 2);
+        }
+        static Expression Create(string arg, CompositeExpression parent)
+        {
+            if (IsCompositeExpression(arg))
+            {
+                string name = GetCompositeExpName(arg);
+
+                CompositeExpression comExp = parent.grammar.Get(name);
+                
+                if (comExp)
+                {
+                    var newComExp = comExp.Copy();
+                    parent.AddChildren(newComExp);
+                    return newComExp;
+                }
+                else
+                {
+                    throw new Exception("Unknown expression " + name);
+                }
+            }
             Expression exp = new Expression();
             exp.content = arg;
             if (parent)
@@ -280,25 +273,55 @@ namespace AGrammar
             return exp;
         }
 
-        static PropExpression Create(Arg.ArgProp arg, AndExpression parent)
+        static PropExpression Create(Arg.ArgProp arg, CompositeExpression parent)
         {
             PropExpression exp = new PropExpression(arg.propName, parent.name);
-            exp.executer = arg.exp;
+            
+            if (arg.exp is int)
+            {
+                Expression executer = new Expression();
+                executer.tokenType = (int)arg.exp;
+                exp.executer = executer;
+            }
+            else if (arg.exp is string)
+            {
+                string name=(string)arg.exp;
+                if (IsCompositeExpression(name))
+                {
+                    CompositeExpression comExp = parent.grammar.Get(GetCompositeExpName(name));
+
+                    if (comExp)
+                    {
+                        var newComExp = comExp.Copy();
+                        exp.executer = comExp;
+                    }
+                    else
+                    {
+                        throw new Exception("Unknown expression " + GetCompositeExpName(name));
+                    }
+                }
+                else
+                {
+                    Expression executer = new Expression();
+                    executer.content = name;
+                    exp.executer = executer;
+                }
+            }
+            else if (arg.exp is Expression)
+            {
+                exp.executer = (Expression)arg.exp;
+            }
+            else
+            {
+                throw new Exception();
+            }
+            
             exp.propertyName = arg.propName;
+
             if (parent)
                 parent.AddChildren(exp);
+
             return exp;
-        }
-        Expression Create(Arg.ArgOr arg, AndExpression parent)
-        {
-            OrExpression or = new OrExpression();
-            parent.AddChildren(or);
-            foreach (var orarg in arg.args)
-            {
-                Expression exp = Create(orarg, null);
-                or.children.Add(exp);
-            }
-            return or;
         }
     }
 }

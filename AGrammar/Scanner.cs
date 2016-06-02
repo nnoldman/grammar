@@ -131,11 +131,16 @@ namespace AGrammar
                         case '=':
                         case '{':
                         case '}':
+                        case '(':
+                        case ')':
+                        case '[':
+                        case ']':
                         case ' ':
                         case '\t':
                         case '.':
                         case ':':
                         case ';':
+                        case ',':
                             {
                                 if (sb.Length > 0)
                                 {

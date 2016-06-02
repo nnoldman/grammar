@@ -16,12 +16,9 @@ namespace AGrammar
     {
         public string name = string.Empty;
 
-        public CompositeType comType = CompositeType.None;
-
         public CompositeExpression()
         {
         }
-
         protected List<Expression> mChildren = new List<Expression>();
 
         public List<Expression> children { get {

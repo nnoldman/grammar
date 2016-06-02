@@ -19,14 +19,31 @@ namespace AGrammar
                 return mChildren;
             }
         }
+        /// <summary>
+        /// use .Array() if it may be array!
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
         public OrExpression IsOneOf(params object[] args)
         {
-            throw new Exception();
+            foreach (var arg in args)
+            {
+                if (arg == null)
+                {
+                    grammar.Error(name + ": Arg can not null");
+                    return null;
+                }
+
+                var tp = arg.GetType();
+
+                grammar.Create(arg, this);
+            }
+            return this;
         }
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append("<");
+            //sb.Append("<");
             for (int i = 0; i < sublings.Count; ++i)
             {
                 var subling = sublings[i];
@@ -36,7 +53,7 @@ namespace AGrammar
                 else
                     sb.Append(" | ");
             }
-            sb.Append(">");
+            //sb.Append(">");
             return sb.ToString();
         }
 
@@ -45,34 +62,94 @@ namespace AGrammar
             if (start + offset == tokens.Count)
                 return true;
 
+            do
+            {
+                if (this.next && this.next.FastMatch(start, ref offset, ref tokens))
+                    return true;
+                if (!MatchOne(ref tokens, start, ref offset, parent, propName))
+                    return false;
+                if (!this.next)
+                    break;
+            } while (countType == CountType.Array && !IsGrammarEnd(start + offset, ref tokens));
+
+            return true;
+        }
+        bool MatchOne(ref List<Token> tokens, int start, ref int offset, GrammarTree parent, string propName)
+        {
             for (int i = 0; i < sublings.Count; ++i)
             {
                 var sub = sublings[i];
-                if (sub.Match(ref tokens, start, ref offset, parent, propName))
+
+                int thisOffset = offset;
+
+                if (sub.Match(ref tokens, start, ref thisOffset, parent, propName))
+                {
+                    offset = thisOffset;
                     return true;
+                }
             }
             return false;
         }
-
         internal override void SetNext()
         {
             base.SetNext();
 
-            if (this.next)
+            for (int i = 0; i < this.sublings.Count; ++i)
             {
-                for (int i = 0; i < this.sublings.Count; ++i)
-                {
-                    var child = sublings[i];
-                    child.next = this.next;
-                    child.parent = this.parent;
-                    child.SetNext();
-                }
+                var child = sublings[i];
+                child.next = this.next;
+                child.SetNext();
             }
         }
 
         internal override Expression GetNextSubling(Expression exp)
         {
-            throw new Exception("The method or operation is not implemented.");
+            if (parent)
+            {
+                var pparent = parent.parent;
+                if (pparent)
+                    return pparent.GetNextSubling(parent);
+            }
+            return null;
+        }
+
+        public override Expression Copy()
+        {
+            OrExpression exp = new OrExpression();
+            exp.name = this.name;
+            exp.tokenType = this.tokenType;
+            exp.content = this.content;
+            exp.countType = this.countType;
+            exp.grammar = this.grammar;
+
+            this.children.ForEach((child) => {
+                var newchild = child.Copy();
+                newchild.parent = exp;
+                exp.children.Add(newchild); 
+            });
+
+
+            return exp;
+        }
+
+        internal override bool FastMatch(int start, ref int offset, ref List<Token> tokens)
+        {
+            int idx = start + offset;
+            if (IsGrammarEnd(idx, ref tokens))
+                return true;
+            for (int i = 0; i < sublings.Count; ++i)
+            {
+                var sub = sublings[i];
+                if (sub.FastMatch(start, ref offset, ref tokens))
+                    return true;
+            }
+            return false;
+        }
+
+        public CompositeExpression Array()
+        {
+            countType = CountType.Array;
+            return this;
         }
     }
 

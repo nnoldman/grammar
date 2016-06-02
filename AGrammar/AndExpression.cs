@@ -6,30 +6,19 @@ using System.Threading.Tasks;
 
 namespace AGrammar
 {
-  public class AndExpression : CompositeExpression
+    public class AndExpression : CompositeExpression
     {
-        public string name = string.Empty;
-        public List<Expression> children
-        {
-            get
-            {
-                return mChildren;
-            }
-        }
         public AndExpression()
         {
-
         }
-
-
 
         internal override void SetNext()
         {
             base.SetNext();
 
-            for (int i = 0; i < mChildren.Count; ++i)
+            for (int i = 0; i < this.children.Count; ++i)
             {
-                var child = mChildren[i];
+                var child = this.children[i];
                 child.SetNext();
             }
         }
@@ -39,94 +28,40 @@ namespace AGrammar
             if (idx == tokens.Count)
                 return true;
 
-            if (countType == CountType.Array)
+            if (mChildren.Count > 0)
             {
-                do
+                GrammarTree childProp = new GrammarTree();
+                childProp.propName = propName.Length > 0 ? propName : name;
+                foreach (var child in mChildren)
                 {
-                    if (!next)
-                        return true;
-                    if (next.FastMatch(start, ref offset, ref tokens))
-                        return true;
-                    if (mChildren.Count > 0)
+                    if (!child.Match(ref tokens, start, ref offset, childProp, propName))
                     {
-                        GrammarTree childProp = new GrammarTree();
-                        childProp.segType = name;
-                        childProp.propName = propName.Length > 0 ? propName : name;
-                        foreach (var child in mChildren)
-                        {
-                            if (!child.Match(ref tokens, start, ref offset, childProp, propName))
-                            {
-                                childProp.propertices.Clear();
-                                return false;
-                            }
-                        }
-                        if (parent)
-                            parent.propertices.Add(childProp);
-                        //return true;
+                        return false;
                     }
-                    else
-                    {
-                        Token token = tokens[idx];
-                        if (token.TokenType == tokenType || token.Content == content)
-                        {
-                            if (propName.Length > 0)
-                            {
-                                PropertyTreeNode prop = new PropertyTreeNode();
-                                prop.propName = propName;
-                                prop.content = token.Content;
-                                parent.propertices.Add(prop);
-                            }
-                            offset++;
-                            return true;
-                        }
-                    }
-                } while (true);
-            }
-            else if (countType == CountType.One)
-            {
-                if (mChildren.Count > 0)
-                {
-                    GrammarTree childProp = new GrammarTree();
-                    childProp.segType = name;
-                    childProp.propName = propName.Length > 0 ? propName : name;
-                    foreach (var child in mChildren)
-                    {
-                        if (!child.Match(ref tokens, start, ref offset, childProp, propName))
-                        {
-                            return false;
-                        }
-                    }
-                    parent.propertices.Add(childProp);
-                    return true;
                 }
-                else
+                parent.propertices.Add(childProp);
+                return true;
+            }
+            else
+            {
+                Token token = tokens[idx];
+                if (token.TokenType == tokenType || token.Content == content)
                 {
-                    Token token = tokens[idx];
-                    if (token.TokenType == tokenType || token.Content == content)
+                    if (propName.Length > 0)
                     {
-                        if (propName.Length > 0)
-                        {
-                            PropertyTreeNode prop = new PropertyTreeNode();
-                            prop.propName = propName;
-                            prop.content = token.Content;
-                            parent.propertices.Add(prop);
-                        }
-                        offset++;
-                        return true;
+                        PropertyTreeNode prop = new PropertyTreeNode();
+                        prop.propName = propName;
+                        prop.content = token.Content;
+                        parent.propertices.Add(prop);
                     }
+                    offset++;
+                    return true;
                 }
             }
             return false;
         }
 
-
-        public AndExpression Array()
-        {
-            countType = CountType.Array;
-            return this;
-        }
-
-        public AndExpression Is(params object[] para)
+        public CompositeExpression Is(params object[] para)
         {
             foreach (var arg in para)
             {
@@ -168,6 +103,22 @@ namespace AGrammar
             }
             return null;
         }
-    }
 
+        public override Expression Copy()
+        {
+            AndExpression exp = new AndExpression();
+            this.children.ForEach((child) =>
+            {
+                var newchild = child.Copy();
+                newchild.parent = exp;
+                exp.children.Add(newchild);
+            });
+            exp.name = this.name;
+            exp.tokenType = this.tokenType;
+            exp.content = this.content;
+            exp.countType = this.countType;
+            exp.grammar = this.grammar;
+            return exp;
+        }
+    }
 }

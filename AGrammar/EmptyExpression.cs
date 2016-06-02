@@ -25,6 +25,14 @@ namespace AGrammar
             }
             return false;
         }
+
+        public override Expression Copy()
+        {
+            EmptyExpression exp = new EmptyExpression();
+            exp.grammar = this.grammar;
+            exp.parent = this.parent;
+            return exp;
+        }
     }
   
 }

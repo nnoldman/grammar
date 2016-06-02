@@ -41,6 +41,8 @@
   <ItemGroup>
     <Compile Include="Arg.cs" />
     <Compile Include="AndExpression.cs" />
+    <Compile Include="BoolObject.cs" />
+    <Compile Include="GrammarTree.cs" />
     <Compile Include="EmptyExpression.cs" />
     <Compile Include="PropExpression.cs" />
     <Compile Include="OrExpression.cs" />
