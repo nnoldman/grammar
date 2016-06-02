@@ -61,6 +61,20 @@ namespace CSGrammar
             new ExternToken(){TokenType= TokenID.InnerType,Content="ulong"},
         };
 
+        void LoadFunction(Grammar g)
+        {
+            g.Or("op").IsOneOf("+", "-", "*", "/");
+            g.And("v2").Is(Arg.Prop("VL", Grammar.ID), Arg.Prop("OP", "<op>"), Arg.Prop("VR", Grammar.ID));
+            g.Or("v").IsOneOf("<v2>", Grammar.ID);
+            g.And("v_rhs").Is("<v>", "<op>", "<v>");
+            g.Or("rhs").IsOneOf("<v2>", Grammar.ID);
+
+            g.And("lhs1").Is(Arg.Prop("T", "<type>"), Arg.Prop("V", Grammar.ID));
+            g.Or("lhs").IsOneOf("<lhs1>", Grammar.ID);
+            g.And("exp").Is("<lhs>", "=", Arg.Prop("rhs", "<rhs>"), ";");
+            g.Or("fun_body").IsOneOf("<exp>", Grammar.Empty).Array();
+        }
+
         void Loader(Grammar g)
         {
             g.Or("permission").IsOneOf(TokenID.Permission, Grammar.Empty);
@@ -71,12 +85,20 @@ namespace CSGrammar
             g.And("arg").Is(Arg.Prop("type", "<type>"), Arg.Prop("name", Grammar.ID), "<arg_ter>");
             g.Or("args").IsOneOf("<arg>", Grammar.Empty).Array();
 
-            g.And("fun").Is("<permission>", "<memory>", Arg.Prop("ret", "<type>"), Arg.Prop("name", Grammar.ID), "(", "<args>", ")", "{", "}");
+            LoadFunction(g);
+
+            g.And("fun").Is("<permission>"
+                , "<memory>"
+                , Arg.Prop("ret", "<type>")
+                , Arg.Prop("name", Grammar.ID)
+                , "(", "<args>", ")"
+                , "{", "<fun_body>", "}");
+
             g.And("member1").Is("<permission>", "<memory>", Arg.Prop("type", "<type>"), Arg.Prop("name", Grammar.ID), ";");
             g.Or("class_body").IsOneOf("<member1>", "<fun>", Grammar.Empty).Array();
 
             g.And("class").Is("<permission>", TokenID.Class, Arg.Prop("name", Grammar.ID), "{", "<class_body>", "}");
-            g.SecOr("grammar").IsOneOf("<class>", Grammar.Empty).Array();
+            g.SecOr("grammar").IsOneOf("<class>").Array();
         }
 
         public GrammarTree Load(Action<string> messageHandler, string content)

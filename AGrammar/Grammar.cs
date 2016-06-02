@@ -19,6 +19,8 @@ namespace AGrammar
         /// Extern token id can not be 0.
         /// </summary>
         public const int ID = 0;
+        
+        public bool Erroring = false;
 
         Action<string> mMessageHandler;
         ExternToken[] mExternTokens;
@@ -76,6 +78,7 @@ namespace AGrammar
             this.mExternTokens = tokens;
             this.mMessageHandler = handler;
             this.mScanner.ErrorHandler = handler;
+            Erroring = false;
 
             LoadExpressions(loader);
 
@@ -101,10 +104,7 @@ namespace AGrammar
                 int offset = 0;
                 CompositeExpression seg = Parse(i, ref offset, tree);
                 if (seg == null)
-                {
-                    Error(mTokens[i + offset].Error());
                     return null;
-                }
                 i += offset;
             }
             return tree;

@@ -37,7 +37,7 @@ namespace AGrammar
         }
         public string Error()
         {
-            return string.Format("Line:{0},Col:{1},Content:{2}", Line, Column, Content);
+            return string.Format("Error=>Line:{0},Col:{1},Content:{2}", Line, Column, Content);
         }
     }
 
@@ -111,6 +111,24 @@ namespace AGrammar
                                     }
                                     commenting = true;
                                 }
+                                else
+                                {
+                                    if (sb.Length > 0)
+                                    {
+                                        int tp = GetTokenType(sb.ToString());
+                                        Token t = new Token(tp, sb.ToString(), line, indexOnLine - sb.Length);
+                                        tokens.Add(t);
+                                        sb.Clear();
+                                    }
+                                    {
+                                        Token t = new Token();
+                                        t.TokenType = -1;
+                                        t.Content = new string(ch, 1);
+                                        t.Line = line;
+                                        t.Column = indexOnLine;
+                                        tokens.Add(t);
+                                    }
+                                }
                             }
                             break;
                         case '\n':
@@ -141,6 +159,9 @@ namespace AGrammar
                         case ':':
                         case ';':
                         case ',':
+                        case '+':
+                        case '-':
+                        case '*':
                             {
                                 if (sb.Length > 0)
                                 {

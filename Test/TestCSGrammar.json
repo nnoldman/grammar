@@ -17,6 +17,38 @@ grammar
         {
             ret:void
             name:Count0
+            exp
+            {
+                lhs1
+                {
+                    T:int
+                    V:a
+                }
+                rhs:0
+            }
+            exp
+            {
+                lhs1
+                {
+                    T:int
+                    V:b
+                }
+                rhs
+                {
+                    VL:a
+                    OP:*
+                    VR:3
+                }
+            }
+            exp
+            {
+                rhs
+                {
+                    VL:a
+                    OP:/
+                    VR:b
+                }
+            }
         }
         member1
         {

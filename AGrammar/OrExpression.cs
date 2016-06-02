@@ -66,11 +66,17 @@ namespace AGrammar
             {
                 if (this.next && this.next.FastMatch(start, ref offset, ref tokens))
                     return true;
+
                 if (!MatchOne(ref tokens, start, ref offset, parent, propName))
+                {
+                    if (!grammar.Erroring)
+                    {
+                        grammar.Error(tokens[start + offset].Error());
+                        grammar.Erroring = true;
+                    }
                     return false;
-                if (!this.next)
-                    break;
-            } while (countType == CountType.Array && !IsGrammarEnd(start + offset, ref tokens));
+                }
+            } while (this.next && countType == CountType.Array && !IsGrammarEnd(start + offset, ref tokens));
 
             return true;
         }

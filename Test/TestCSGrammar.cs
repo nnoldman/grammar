@@ -5,7 +5,9 @@
 
     public void Count0()
     {
-
+		int a=0;
+		int b=a*3;
+		c=a/b;
     }
 
     public bool array;

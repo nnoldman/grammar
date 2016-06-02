@@ -45,7 +45,7 @@ namespace AGrammar
             else
             {
                 Token token = tokens[idx];
-                if (token.TokenType == tokenType || token.Content == content)
+                if ((InvalidTokenType != tokenType && token.TokenType == tokenType) || token.Content == content)
                 {
                     if (propName.Length > 0)
                     {
@@ -58,6 +58,7 @@ namespace AGrammar
                     return true;
                 }
             }
+            grammar.Error(tokens[start + offset]);
             return false;
         }
 
