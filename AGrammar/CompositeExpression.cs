@@ -21,12 +21,18 @@ namespace AGrammar
         }
         protected List<Expression> mChildren = new List<Expression>();
 
-        public List<Expression> children { get {
-            return mChildren; } }
+        public List<Expression> children
+        {
+            get
+            {
+                return mChildren;
+            }
+        }
 
         internal void AddChildren(Expression exp)
         {
             children.Add(exp);
+            exp.grammar = this.grammar;
             exp.parent = this;
         }
 
@@ -34,7 +40,5 @@ namespace AGrammar
         {
             throw new Exception();
         }
-
- 
     }
 }

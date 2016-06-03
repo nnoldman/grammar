@@ -17,9 +17,9 @@ namespace AGrammar
             this.propertyName = propName;
             this.parentName = parentName;
         }
-        internal override bool Match(ref List<Token> tokens, int start, ref int offset, GrammarTree parent, string propName)
+        internal override bool Match(int start, ref int offset, GrammarTree parent, string propName)
         {
-            if (executer.Match(ref tokens, start, ref offset, parent, this.propertyName))
+            if (executer.Match(start, ref offset, parent, this.propertyName))
             {
                 return true;
             }
@@ -31,9 +31,9 @@ namespace AGrammar
             return parentName + "." + propertyName;
         }
 
-        internal override bool FastMatch(int start, ref int offset, ref List<Token> tokens)
+        internal override bool FastMatch(int start, ref int offset)
         {
-            if (executer.FastMatch(start, ref offset, ref tokens))
+            if (executer.FastMatch(start, ref offset))
             {
                 return true;
             }

@@ -22,10 +22,10 @@ namespace AGrammar
                 child.SetNext();
             }
         }
-        internal override bool Match(ref List<Token> tokens, int start, ref int offset, GrammarTree parent, string propName)
+        internal override bool Match(int start, ref int offset, GrammarTree parent, string propName)
         {
             int idx = start + offset;
-            if (idx == tokens.Count)
+            if (IsGrammarEnd(idx))
                 return true;
 
             if (mChildren.Count > 0)
@@ -34,7 +34,7 @@ namespace AGrammar
                 childProp.propName = propName.Length > 0 ? propName : name;
                 foreach (var child in mChildren)
                 {
-                    if (!child.Match(ref tokens, start, ref offset, childProp, propName))
+                    if (!child.Match(start, ref offset, childProp, propName))
                     {
                         return false;
                     }
@@ -44,7 +44,7 @@ namespace AGrammar
             }
             else
             {
-                Token token = tokens[idx];
+                Token token = grammar.Tokens[idx];
                 if ((InvalidTokenType != tokenType && token.TokenType == tokenType) || token.Content == content)
                 {
                     if (propName.Length > 0)
@@ -58,7 +58,7 @@ namespace AGrammar
                     return true;
                 }
             }
-            grammar.Error(tokens[start + offset]);
+            grammar.Error(grammar.Tokens[start + offset]);
             return false;
         }
 

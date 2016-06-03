@@ -64,14 +64,16 @@ namespace CSGrammar
         void LoadFunction(Grammar g)
         {
             g.Or("op").IsOneOf("+", "-", "*", "/");
-            g.And("v2").Is(Arg.Prop("VL", Grammar.ID), Arg.Prop("OP", "<op>"), Arg.Prop("VR", Grammar.ID));
-            g.Or("v").IsOneOf("<v2>", Grammar.ID);
-            g.And("v_rhs").Is("<v>", "<op>", "<v>");
-            g.Or("rhs").IsOneOf("<v2>", Grammar.ID);
+            g.And("v1").Is(Arg.Prop("VL", Grammar.ID), Arg.Prop("OP", "<op>"), Arg.Prop("VR", Grammar.ID));
+            g.And("v2").Is(Arg.Prop("VL", "<v1>"), Arg.Prop("OP", "<op>"), Arg.Prop("VR", Grammar.ID));
+            g.And("v3").Is(Arg.Prop("VL", Grammar.ID), Arg.Prop("OP", "<op>"), Arg.Prop("VR", "<v1>"));
+            g.Or("v").IsOneOf("<v3>", "<v2>", "<v1>", Grammar.ID);
+            g.And("exp_rhs").Is("<v>", "<op>", "<v>");
+            g.Or("rhs").IsOneOf("<exp_rhs>", Grammar.ID);
 
             g.And("lhs1").Is(Arg.Prop("T", "<type>"), Arg.Prop("V", Grammar.ID));
             g.Or("lhs").IsOneOf("<lhs1>", Grammar.ID);
-            g.And("exp").Is("<lhs>", "=", Arg.Prop("rhs", "<rhs>"), ";");
+            g.And("exp").Is(Arg.Prop("rhs", "<lhs>"), "=", Arg.Prop("rhs", "<rhs>"), ";");
             g.Or("fun_body").IsOneOf("<exp>", Grammar.Empty).Array();
         }
 

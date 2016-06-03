@@ -57,30 +57,30 @@ namespace AGrammar
             return sb.ToString();
         }
 
-        internal override bool Match(ref List<Token> tokens, int start, ref int offset, GrammarTree parent, string propName)
+        internal override bool Match(int start, ref int offset, GrammarTree parent, string propName)
         {
-            if (start + offset == tokens.Count)
+            if (start + offset == grammar.Tokens.Count)
                 return true;
 
             do
             {
-                if (this.next && this.next.FastMatch(start, ref offset, ref tokens))
+                if (this.next && this.next.FastMatch(start, ref offset))
                     return true;
 
-                if (!MatchOne(ref tokens, start, ref offset, parent, propName))
+                if (!MatchOne(start, ref offset, parent, propName))
                 {
                     if (!grammar.Erroring)
                     {
-                        grammar.Error(tokens[start + offset].Error());
+                        grammar.Error(grammar.Tokens[start + offset].Error());
                         grammar.Erroring = true;
                     }
                     return false;
                 }
-            } while (this.next && countType == CountType.Array && !IsGrammarEnd(start + offset, ref tokens));
+            } while (this.next && countType == CountType.Array && !IsGrammarEnd(start + offset));
 
             return true;
         }
-        bool MatchOne(ref List<Token> tokens, int start, ref int offset, GrammarTree parent, string propName)
+        bool MatchOne(int start, ref int offset, GrammarTree parent, string propName)
         {
             for (int i = 0; i < sublings.Count; ++i)
             {
@@ -88,7 +88,7 @@ namespace AGrammar
 
                 int thisOffset = offset;
 
-                if (sub.Match(ref tokens, start, ref thisOffset, parent, propName))
+                if (sub.Match(start, ref thisOffset, parent, propName))
                 {
                     offset = thisOffset;
                     return true;
@@ -128,25 +128,26 @@ namespace AGrammar
             exp.countType = this.countType;
             exp.grammar = this.grammar;
 
-            this.children.ForEach((child) => {
+            this.children.ForEach((child) =>
+            {
                 var newchild = child.Copy();
                 newchild.parent = exp;
-                exp.children.Add(newchild); 
+                exp.children.Add(newchild);
             });
 
 
             return exp;
         }
 
-        internal override bool FastMatch(int start, ref int offset, ref List<Token> tokens)
+        internal override bool FastMatch(int start, ref int offset)
         {
             int idx = start + offset;
-            if (IsGrammarEnd(idx, ref tokens))
+            if (IsGrammarEnd(idx))
                 return true;
             for (int i = 0; i < sublings.Count; ++i)
             {
                 var sub = sublings[i];
-                if (sub.FastMatch(start, ref offset, ref tokens))
+                if (sub.FastMatch(start, ref offset))
                     return true;
             }
             return false;

@@ -19,7 +19,7 @@ namespace AGrammar
         /// Extern token id can not be 0.
         /// </summary>
         public const int ID = 0;
-        
+
         public bool Erroring = false;
 
         Action<string> mMessageHandler;
@@ -52,6 +52,13 @@ namespace AGrammar
                 return mTree;
             }
         }
+        internal List<Token> Tokens
+        {
+            get
+            {
+                return mTokens;
+            }
+        }
         internal void Error(string msg)
         {
             if (mMessageHandler != null)
@@ -70,7 +77,7 @@ namespace AGrammar
             this.mTree.WriteTo(sb);
             return new UTF8Encoding(false).GetBytes(sb.ToString().ToCharArray());
         }
-        public GrammarTree Generate(string content, ExternToken[] tokens, Action<string> handler,Action<Grammar> loader)
+        public GrammarTree Generate(string content, ExternToken[] tokens, Action<string> handler, Action<Grammar> loader)
         {
             if (loader == null)
                 return null;
@@ -91,7 +98,7 @@ namespace AGrammar
 
             if (mMessageHandler != null)
                 mMessageHandler(string.Format("Time:{0:00}:{1:00}:{2:00}:{3:00}", span.Hours, span.Minutes, span.Seconds, span.Milliseconds));
-            
+
             return mTree;
         }
         GrammarTree GenerateTree()
@@ -99,7 +106,7 @@ namespace AGrammar
             GrammarTree tree = new GrammarTree();
             tree.propName = "grammar";
 
-            for (int i = 0; i < mTokens.Count;)
+            for (int i = 0; i < mTokens.Count; )
             {
                 int offset = 0;
                 CompositeExpression seg = Parse(i, ref offset, tree);
@@ -113,7 +120,7 @@ namespace AGrammar
         {
             foreach (var exp in this.mSections.Values)
             {
-                if (exp.Match(ref mTokens, idx, ref offset, parent, string.Empty))
+                if (exp.Match(idx, ref offset, parent, string.Empty))
                     return exp;
             }
             return null;
@@ -254,7 +261,7 @@ namespace AGrammar
                 string name = GetCompositeExpName(arg);
 
                 CompositeExpression comExp = parent.grammar.Get(name);
-                
+
                 if (comExp)
                 {
                     var newComExp = comExp.Copy();
@@ -268,15 +275,19 @@ namespace AGrammar
             }
             Expression exp = new Expression();
             exp.content = arg;
+
             if (parent)
+            {
+                exp.grammar = parent.grammar;
                 parent.AddChildren(exp);
+            }
             return exp;
         }
 
         static PropExpression Create(Arg.ArgProp arg, CompositeExpression parent)
         {
             PropExpression exp = new PropExpression(arg.propName, parent.name);
-            
+            exp.grammar = parent.grammar;
             if (arg.exp is int)
             {
                 Expression executer = new Expression();
@@ -285,7 +296,7 @@ namespace AGrammar
             }
             else if (arg.exp is string)
             {
-                string name=(string)arg.exp;
+                string name = (string)arg.exp;
                 if (IsCompositeExpression(name))
                 {
                     CompositeExpression comExp = parent.grammar.Get(GetCompositeExpName(name));
@@ -315,11 +326,15 @@ namespace AGrammar
             {
                 throw new Exception();
             }
-            
+
             exp.propertyName = arg.propName;
 
             if (parent)
+            {
+                exp.executer.grammar = parent.grammar;
+                exp.grammar = parent.grammar;
                 parent.AddChildren(exp);
+            }
 
             return exp;
         }

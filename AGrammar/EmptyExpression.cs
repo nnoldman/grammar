@@ -13,14 +13,14 @@ namespace AGrammar
             return "Empty";
         }
 
-        internal override bool Match(ref List<Token> tokens, int start, ref int offset, GrammarTree parent, string propName)
+        internal override bool Match(int start, ref int offset, GrammarTree parent, string propName)
         {
             if (!next)
                 return true;
             int idx = start + offset;
-            if (idx <= tokens.Count - 1)
+            if (idx <= grammar.Tokens.Count - 1)
             {
-                if (next.FastMatch(start, ref offset, ref tokens))
+                if (next.FastMatch(start, ref offset))
                     return true;
             }
             return false;
@@ -34,5 +34,5 @@ namespace AGrammar
             return exp;
         }
     }
-  
+
 }

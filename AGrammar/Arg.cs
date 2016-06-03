@@ -26,7 +26,7 @@ namespace AGrammar
         {
             ArgProp arg = new ArgProp();
             arg.propName = propName;
-            arg.exp= content;
+            arg.exp = content;
             return arg;
         }
 

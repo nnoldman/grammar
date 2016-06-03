@@ -15,6 +15,7 @@ namespace AGrammar
     public class Expression : BoolObject
     {
         public static int InvalidTokenType = -1;
+
         public int tokenType = InvalidTokenType;
         public string content = string.Empty;
         public CompositeExpression parent;
@@ -42,12 +43,12 @@ namespace AGrammar
             if (parent && !next)
                 this.next = parent.GetNextSubling(this);
         }
-        internal virtual bool FastMatch(int start, ref int offset, ref List<Token> tokens)
+        internal virtual bool FastMatch(int start, ref int offset)
         {
             int idx = start + offset;
-            if (IsGrammarEnd(idx, ref tokens))
+            if (IsGrammarEnd(idx))
                 return true;
-            Token token = tokens[idx];
+            Token token = grammar.Tokens[idx];
             return (InvalidTokenType != tokenType && tokenType == token.TokenType) || content == token.Content;
         }
 
@@ -58,16 +59,17 @@ namespace AGrammar
             else
                 return tokenType == Grammar.ID ? "ID" : tokenType.ToString();
         }
-        internal bool IsGrammarEnd(int idx, ref List<Token> tokens)
+        internal bool IsGrammarEnd(int idx)
         {
-            return idx == tokens.Count;
+            return idx == grammar.Tokens.Count;
         }
-        internal virtual bool Match(ref List<Token> tokens, int start, ref int offset, GrammarTree parent, string propName)
+        internal virtual bool Match(int start, ref int offset, GrammarTree parent, string propName)
         {
             int idx = start + offset;
-            if (IsGrammarEnd(idx, ref tokens))
+            if (IsGrammarEnd(idx))
                 return true;
-            Token token = tokens[idx];
+
+            Token token = grammar.Tokens[idx];
 
             if ((InvalidTokenType != tokenType && tokenType == token.TokenType) || content == token.Content)
             {
