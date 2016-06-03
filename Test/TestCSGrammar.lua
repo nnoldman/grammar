@@ -61,7 +61,10 @@ grammar
                     VL:a
                     VR
                     {
-                        OP:-
+                        VR:-
+                    }
+                    VR
+                    {
                         VR:4
                     }
                 }
@@ -90,7 +93,10 @@ grammar
                     VL:10
                     VR
                     {
-                        OP:*
+                        VR:*
+                    }
+                    VR
+                    {
                         VR:6
                     }
                 }
@@ -106,37 +112,58 @@ grammar
                     VL:a
                     VR
                     {
-                        OP:/
+                        VR:/
+                    }
+                    VR
+                    {
                         VR:b
                     }
                     VR
                     {
-                        OP:+
+                        VR:+
+                    }
+                    VR
+                    {
                         VR:5
                     }
                     VR
                     {
-                        OP:*
+                        VR:*
+                    }
+                    VR
+                    {
                         VR:a
                     }
                     VR
                     {
-                        OP:*
+                        VR:*
+                    }
+                    VR
+                    {
                         VR:b
                     }
                     VR
                     {
-                        OP:*
+                        VR:*
+                    }
+                    VR
+                    {
                         VR:d
                     }
                     VR
                     {
-                        OP:/
+                        VR:/
+                    }
+                    VR
+                    {
                         VR:3
                     }
                     VR
                     {
-                        OP:*
+                        VR:*
+                    }
+                    VR
+                    {
                         VR:e
                     }
                 }

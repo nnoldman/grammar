@@ -40,29 +40,29 @@ namespace CSGrammar
             public const int Var = 18;
             public const int Const = 19;
         }
-        static ExternToken[] Tokens = new ExternToken[]
+        static KeyWord[] Tokens = new KeyWord[]
         {
-            new ExternToken(){TokenType= TokenID.Comment,Content="//"},
-            new ExternToken(){TokenType= TokenID.Using,Content="using"},
-            new ExternToken(){TokenType= TokenID.Namespace,Content="namespace"},
-            new ExternToken(){TokenType= TokenID.Class,Content="class"},
-            new ExternToken(){TokenType= TokenID.Permission,Content="public"},
-            new ExternToken(){TokenType= TokenID.Permission,Content="protected"},
-            new ExternToken(){TokenType= TokenID.Permission,Content="private"},
-            new ExternToken(){TokenType= TokenID.Memory,Content="static"},
-            new ExternToken(){TokenType= TokenID.New,Content="new"},
+            new KeyWord(){WordType= TokenID.Comment,Word="//"},
+            new KeyWord(){WordType= TokenID.Using,Word="using"},
+            new KeyWord(){WordType= TokenID.Namespace,Word="namespace"},
+            new KeyWord(){WordType= TokenID.Class,Word="class"},
+            new KeyWord(){WordType= TokenID.Permission,Word="public"},
+            new KeyWord(){WordType= TokenID.Permission,Word="protected"},
+            new KeyWord(){WordType= TokenID.Permission,Word="private"},
+            new KeyWord(){WordType= TokenID.Memory,Word="static"},
+            new KeyWord(){WordType= TokenID.New,Word="new"},
 
-            new ExternToken(){TokenType= TokenID.InnerType,Content="void"},
-            new ExternToken(){TokenType= TokenID.InnerType,Content="int"},
-            new ExternToken(){TokenType= TokenID.InnerType,Content="uint"},
-            new ExternToken(){TokenType= TokenID.InnerType,Content="string"},
-            new ExternToken(){TokenType= TokenID.InnerType,Content="bool"},
-            new ExternToken(){TokenType= TokenID.InnerType,Content="Int64"},
-            new ExternToken(){TokenType= TokenID.InnerType,Content="UInt64"},
-            new ExternToken(){TokenType= TokenID.InnerType,Content="float"},
-            new ExternToken(){TokenType= TokenID.InnerType,Content="double"},
-            new ExternToken(){TokenType= TokenID.InnerType,Content="long"},
-            new ExternToken(){TokenType= TokenID.InnerType,Content="ulong"},
+            new KeyWord(){WordType= TokenID.InnerType,Word="void"},
+            new KeyWord(){WordType= TokenID.InnerType,Word="int"},
+            new KeyWord(){WordType= TokenID.InnerType,Word="uint"},
+            new KeyWord(){WordType= TokenID.InnerType,Word="string"},
+            new KeyWord(){WordType= TokenID.InnerType,Word="bool"},
+            new KeyWord(){WordType= TokenID.InnerType,Word="Int64"},
+            new KeyWord(){WordType= TokenID.InnerType,Word="UInt64"},
+            new KeyWord(){WordType= TokenID.InnerType,Word="float"},
+            new KeyWord(){WordType= TokenID.InnerType,Word="double"},
+            new KeyWord(){WordType= TokenID.InnerType,Word="long"},
+            new KeyWord(){WordType= TokenID.InnerType,Word="ulong"},
         };
 
         void LoadFunction(Grammar g)

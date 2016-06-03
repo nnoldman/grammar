@@ -23,7 +23,7 @@ namespace AGrammar
         public bool Erroring = false;
 
         Action<string> mMessageHandler;
-        ExternToken[] mExternTokens;
+        KeyWord[] mExternTokens;
 
         Scanner mScanner;
         List<Token> mTokens;
@@ -44,6 +44,17 @@ namespace AGrammar
             mTokens = new List<Token>();
             mSegments = new Dictionary<string, CompositeExpression>();
             mSections = new Dictionary<string, CompositeExpression>();
+        }
+        public string[] Termins
+        {
+            get
+            {
+                return mScanner.Termins;
+            }
+            set
+            {
+                mScanner.Termins = value;
+            }
         }
         public GrammarTree Tree
         {
@@ -77,7 +88,25 @@ namespace AGrammar
             this.mTree.WriteTo(sb);
             return new UTF8Encoding(false).GetBytes(sb.ToString().ToCharArray());
         }
-        public GrammarTree Generate(string content, ExternToken[] tokens, Action<string> handler, Action<Grammar> loader)
+
+        public void LineComment(string s)
+        {
+            mScanner.LineComment = s;
+        }
+        public void AddTerminations(params string[] args)
+        {
+            mScanner.Termins = args;
+        }
+        public void BlockComment(string s, string e)
+        {
+            mScanner.BlockCommentStart = s;
+            mScanner.BlockCommentEnd = e;
+
+            Debug.Assert(!string.IsNullOrEmpty(mScanner.BlockCommentStart));
+            Debug.Assert(!string.IsNullOrEmpty(mScanner.BlockCommentEnd));
+        }
+
+        public GrammarTree Generate(string content, KeyWord[] tokens, Action<string> handler, Action<Grammar> loader)
         {
             if (loader == null)
                 return null;
@@ -220,8 +249,8 @@ namespace AGrammar
         {
             foreach (var param in mExternTokens)
             {
-                if (param.TokenType == tokenid)
-                    return param.Content;
+                if (param.WordType == tokenid)
+                    return param.Word;
             }
             return string.Empty;
         }

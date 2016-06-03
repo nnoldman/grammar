@@ -49,7 +49,7 @@ namespace AGrammar
             if (IsGrammarEnd(idx))
                 return true;
             Token token = grammar.Tokens[idx];
-            return (InvalidTokenType != tokenType && tokenType == token.TokenType) || content == token.Content;
+            return (InvalidTokenType != tokenType && tokenType == token.WordType) || content == token.Word;
         }
 
         public override string ToString()
@@ -71,12 +71,12 @@ namespace AGrammar
 
             Token token = grammar.Tokens[idx];
 
-            if ((InvalidTokenType != tokenType && tokenType == token.TokenType) || content == token.Content)
+            if ((InvalidTokenType != tokenType && tokenType == token.WordType) || content == token.Word)
             {
                 if (!string.IsNullOrEmpty(propName))
                 {
                     PropertyTreeNode prop = new PropertyTreeNode();
-                    prop.content = token.Content;
+                    prop.content = token.Word;
                     prop.propName = propName;
                     parent.propertices.Add(prop);
                 }

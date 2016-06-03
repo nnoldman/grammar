@@ -45,13 +45,13 @@ namespace AGrammar
             else
             {
                 Token token = grammar.Tokens[idx];
-                if ((InvalidTokenType != tokenType && token.TokenType == tokenType) || token.Content == content)
+                if ((InvalidTokenType != tokenType && token.WordType == tokenType) || token.Word == content)
                 {
                     if (propName.Length > 0)
                     {
                         PropertyTreeNode prop = new PropertyTreeNode();
                         prop.propName = propName;
-                        prop.content = token.Content;
+                        prop.content = token.Word;
                         parent.propertices.Add(prop);
                     }
                     offset++;
