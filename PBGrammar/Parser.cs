@@ -41,10 +41,10 @@ namespace PBGrammar
             g.And("package").Is(TokenID.Package, Grammar.ID, ".", Grammar.ID, ";");
             g.Or("typename").IsOneOf(TokenID.TypeName, Grammar.ID);
             g.Or("condition").IsOneOf(TokenID.Option, TokenID.Repeated);
-            g.And("member").Is(Arg.Prop("condition", "<condition>"), Arg.Prop("typename", "<typename>"), Arg.Prop("name", Grammar.ID), "=", Arg.Prop("id", Grammar.ID), ";");
+            g.And("member").Is(Arg.P("condition", "<condition>"), Arg.P("typename", "<typename>"), Arg.P("name", Grammar.ID), "=", Arg.P("id", Grammar.ID), ";");
             g.Or("message_body").IsOneOf("<member>", Grammar.Empty).Array();
             g.Or("msg_ter").IsOneOf(";", Grammar.Empty);
-            g.And("message").Is(TokenID.Message, Arg.Prop("name", Grammar.ID), "{", "<message_body>", "}", "<msg_ter>");
+            g.And("message").Is(TokenID.Message, Arg.P("name", Grammar.ID), "{", "<message_body>", "}", "<msg_ter>");
             g.SecOr("grammar").IsOneOf("<package>", "<message>").Array();
         }
         public GrammarTree Load(Action<string> errorHandler, string content)

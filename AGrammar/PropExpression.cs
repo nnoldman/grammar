@@ -53,8 +53,13 @@ namespace AGrammar
 
         internal override void SetNext()
         {
+            base.SetNext();
+
             if (this.next)
+            {
                 this.executer.next = this.next;
+                this.executer.SetNext();
+            }
         }
     }
 }

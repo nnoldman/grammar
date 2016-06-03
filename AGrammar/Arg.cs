@@ -8,21 +8,39 @@ namespace AGrammar
 {
     public class Arg
     {
-        public static ArgProp Prop(string propName, CompositeExpression exp)
+        /// <summary>
+        /// property
+        /// </summary>
+        /// <param name="propName"></param>
+        /// <param name="exp"></param>
+        /// <returns></returns>
+        public static ArgProp P(string propName, CompositeExpression exp)
         {
             ArgProp arg = new ArgProp();
             arg.propName = propName;
             arg.exp = exp;
             return arg;
         }
-        public static ArgProp Prop(string propName, int tokenID)
+        /// <summary>
+        /// property
+        /// </summary>
+        /// <param name="propName"></param>
+        /// <param name="tokenID"></param>
+        /// <returns></returns>
+        public static ArgProp P(string propName, int tokenID)
         {
             ArgProp arg = new ArgProp();
             arg.propName = propName;
             arg.exp = tokenID;
             return arg;
         }
-        public static ArgProp Prop(string propName, string content)
+        /// <summary>
+        /// property
+        /// </summary>
+        /// <param name="propName"></param>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        public static ArgProp P(string propName, string content)
         {
             ArgProp arg = new ArgProp();
             arg.propName = propName;

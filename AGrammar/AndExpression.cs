@@ -102,7 +102,7 @@ namespace AGrammar
             {
                 return children[idx + 1];
             }
-            return null;
+            return this.next;
         }
 
         public override Expression Copy()

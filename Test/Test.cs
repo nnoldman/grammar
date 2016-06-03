@@ -10,6 +10,7 @@ public class Tester
 {
     static void HandleMessage(string msg)
     {
+        Debug.WriteLine(msg);
         Console.WriteLine(msg);
     }
     public static void TestCSGrammar()
@@ -17,7 +18,7 @@ public class Tester
         CSGrammar.Parser p = new CSGrammar.Parser();
         string content = File.ReadAllText("TestCSGrammar.cs");
         p.Load(HandleMessage, content);
-        p.Dump("TestCSGrammar.json");
+        p.Dump("TestCSGrammar.lua");
     }
 
     public static void TestPBGrammar()
@@ -25,6 +26,6 @@ public class Tester
         PBGrammar.Parser p = new PBGrammar.Parser();
         string content = File.ReadAllText("commondData.proto");
         p.Load(HandleMessage, content);
-        p.Dump("TestPBGrammar.json");
+        p.Dump("TestPBGrammar.lua");
     }
 }

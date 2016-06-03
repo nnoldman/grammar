@@ -15,6 +15,10 @@ namespace CSGrammar
 
         public class TokenID
         {
+            /// <summary>
+            /// 0 is reserved
+            /// </summary>
+            //public const int ID = 0;
             public const int Using = 1;
             public const int Namespace = 2;
             public const int Class = 3;
@@ -64,16 +68,23 @@ namespace CSGrammar
         void LoadFunction(Grammar g)
         {
             g.Or("op").IsOneOf("+", "-", "*", "/");
-            g.And("v1").Is(Arg.Prop("VL", Grammar.ID), Arg.Prop("OP", "<op>"), Arg.Prop("VR", Grammar.ID));
-            g.And("v2").Is(Arg.Prop("VL", "<v1>"), Arg.Prop("OP", "<op>"), Arg.Prop("VR", Grammar.ID));
-            g.And("v3").Is(Arg.Prop("VL", Grammar.ID), Arg.Prop("OP", "<op>"), Arg.Prop("VR", "<v1>"));
-            g.Or("v").IsOneOf("<v3>", "<v2>", "<v1>", Grammar.ID);
-            g.And("exp_rhs").Is("<v>", "<op>", "<v>");
-            g.Or("rhs").IsOneOf("<exp_rhs>", Grammar.ID);
 
-            g.And("lhs1").Is(Arg.Prop("T", "<type>"), Arg.Prop("V", Grammar.ID));
-            g.Or("lhs").IsOneOf("<lhs1>", Grammar.ID);
-            g.And("exp").Is(Arg.Prop("rhs", "<lhs>"), "=", Arg.Prop("rhs", "<rhs>"), ";");
+            g.And("vr1").Is(Arg.P("VL", Grammar.ID), Arg.P("OP", "<op>"), Arg.P("VR", Grammar.ID));
+            g.Or("vr2").IsOneOf(Grammar.ID, "<vr1>");
+            g.And("vr3").Is(Arg.P("OP", "<op>"), Arg.P("VR", "<vr2>"));
+
+            g.Or("vr4").IsOneOf(Arg.P("VR", "<vr3>")).Array();
+
+            g.And("vr5").Is(Arg.P("VL", "<vr2>"), Arg.P("VR", "<vr4>"));
+
+            g.Or("right_exp").IsOneOf("<vr5>", Grammar.ID);
+
+            g.And("declaration").Is(Arg.P("T", "<type>"), Arg.P("V", Grammar.ID));
+            
+            g.Or("left_exp").IsOneOf("<declaration>", Grammar.ID);
+
+            g.And("exp").Is(Arg.P("LE", "<left_exp>"), "=", Arg.P("RE", "<right_exp>"), ";");
+
             g.Or("fun_body").IsOneOf("<exp>", Grammar.Empty).Array();
         }
 
@@ -84,22 +95,22 @@ namespace CSGrammar
             g.Or("type").IsOneOf(TokenID.InnerType, Grammar.ID);
 
             g.Or("arg_ter").IsOneOf(",", Grammar.Empty);
-            g.And("arg").Is(Arg.Prop("type", "<type>"), Arg.Prop("name", Grammar.ID), "<arg_ter>");
+            g.And("arg").Is(Arg.P("type", "<type>"), Arg.P("name", Grammar.ID), "<arg_ter>");
             g.Or("args").IsOneOf("<arg>", Grammar.Empty).Array();
 
             LoadFunction(g);
 
             g.And("fun").Is("<permission>"
                 , "<memory>"
-                , Arg.Prop("ret", "<type>")
-                , Arg.Prop("name", Grammar.ID)
+                , Arg.P("ret", "<type>")
+                , Arg.P("name", Grammar.ID)
                 , "(", "<args>", ")"
                 , "{", "<fun_body>", "}");
 
-            g.And("member1").Is("<permission>", "<memory>", Arg.Prop("type", "<type>"), Arg.Prop("name", Grammar.ID), ";");
+            g.And("member1").Is("<permission>", "<memory>", Arg.P("type", "<type>"), Arg.P("name", Grammar.ID), ";");
             g.Or("class_body").IsOneOf("<member1>", "<fun>", Grammar.Empty).Array();
 
-            g.And("class").Is("<permission>", TokenID.Class, Arg.Prop("name", Grammar.ID), "{", "<class_body>", "}");
+            g.And("class").Is("<permission>", TokenID.Class, Arg.P("name", Grammar.ID), "{", "<class_body>", "}");
             g.SecOr("grammar").IsOneOf("<class>").Array();
         }
 
