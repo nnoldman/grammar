@@ -1,223 +1,233 @@
 grammar
 {
-    class
+    Class
     {
-        name:TestCSGrammar
-        fun
+        Name:TestCSGrammar
+        Fun
         {
-            ret:int
-            name:CX
-            return
+            RET:int
+            Name:CX
+            Return
             {
-                vr3
+                Var_Com
                 {
                     V:0
                 }
             }
         }
-        member1
+        Member1
         {
             Per:public
-            type:int
-            name:id
+            Type:int
+            Name:id
         }
-        member1
+        Member1
         {
             Per:public
-            type:string
-            name:name
+            Type:string
+            Name:name
         }
-        fun
+        Fun
         {
             Per:public
-            ret:void
-            name:Count1
-            arg
+            RET:void
+            Name:Count1
+            Argument
             {
-                type:int
-                name:a
+                ArgFirst
+                {
+                    ArgType:int
+                    ArgV:a
+                }
             }
         }
-        fun
+        Fun
         {
             Per:public
-            ret:void
-            name:Count0
-            arg
+            RET:void
+            Name:Count0
+            Argument
             {
-                type:int
-                name:x1
+                ArgFirst
+                {
+                    ArgType:int
+                    ArgV:x1
+                }
+                ArgTrial
+                {
+                    ArgType:string
+                    ArgV:y2
+                }
+                ArgTrial
+                {
+                    ArgType:int
+                    ArgV:ppp
+                }
+                ArgTrial
+                {
+                    ArgType:string
+                    ArgV:jjj
+                }
             }
-            arg
+            Exp1
             {
-                type:string
-                name:y2
-            }
-            exp1
-            {
-                LE
+                LeftExp
                 {
                     T:int
                     V:a
                 }
-                RE
+                RightExp
                 {
                     V:6
                 }
             }
-            exp1
+            Exp1
             {
-                LE
+                LeftExp
                 {
                     T:int
                     V:b
                 }
-                RE
+                RightExp
                 {
                     V:a
                     R
                     {
-                        OP:-
-                        VR:4
+                        Op:-
+                        V:4
                     }
                 }
             }
-            exp1
+            Exp1
             {
-                LE
+                LeftExp
                 {
                     T:int
                     V:d
                 }
-                RE
+                RightExp
                 {
                     V:3
                 }
             }
-            exp1
+            Exp1
             {
-                LE
+                LeftExp
                 {
                     T:int
                     V:e
                 }
-                RE
+                RightExp
                 {
-                    V:10
+                    V:6
                     R
                     {
-                        OP:*
-                        VR:6
+                        Op:*
+                        V:6
                     }
                 }
             }
-            exp1
+            Exp1
             {
-                LE:b
-                RE
+                VL:b
+                RightExp
                 {
                     V:a
                     R
                     {
-                        OP:/
-                        VR:b
+                        Op:/
+                        V:b
                     }
                     R
                     {
-                        OP:+
-                        VR:5
+                        Op:+
+                        V:5
                     }
                     R
                     {
-                        OP:*
-                        VR:a
+                        Op:*
+                        V:a
                     }
                     R
                     {
-                        OP:*
-                        VR:b
+                        Op:*
+                        V:b
                     }
                     R
                     {
-                        OP:*
-                        VR:d
+                        Op:*
+                        V:d
                     }
                     R
                     {
-                        OP:/
-                        VR:3
+                        Op:/
+                        V:3
                     }
                     R
                     {
-                        OP:*
-                        VR:e
+                        Op:*
+                        V:e
                     }
                 }
             }
-            exp2
+            Exp1
             {
-                LE:d
-                OP:+=
-                RE
+                VL:d
+                RightExp
                 {
                     V:a
                     R
                     {
-                        OP:/
-                        VR:b
+                        Op:/
+                        V:4
                     }
                     R
                     {
-                        OP:+
-                        VR:5
+                        Op:+
+                        V
+                        {
+                            LB:(
+                            V:b
+                            Op:+
+                            V:5
+                            RB:)
+                        }
                     }
                     R
                     {
-                        OP:*
-                        VR:a
-                    }
-                    R
-                    {
-                        OP:*
-                        VR:b
-                    }
-                    R
-                    {
-                        OP:*
-                        VR:d
-                    }
-                    R
-                    {
-                        OP:/
-                        VR:3
-                    }
-                    R
-                    {
-                        OP:*
-                        VR:e
+                        Op:+
+                        V
+                        {
+                            (:(
+                            V:3
+                            ):)
+                        }
                     }
                 }
             }
         }
-        fun
+        Fun
         {
             Per:public
-            ret:int
-            name:Count3
-            arg
+            RET:int
+            Name:Count3
+            Argument
             {
-                type:int
-                name:a
+                ArgFirst
+                {
+                    ArgType:int
+                    ArgV:a
+                }
             }
-            return
+            Return
             {
-                vr3
+                Var_Com
                 {
                     V:a
                     R
                     {
-                        OP:+
-                        VR:2
+                        Op:+
+                        V:2
                     }
                 }
             }

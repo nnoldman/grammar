@@ -40,6 +40,13 @@ namespace AGrammar
             }
             return this;
         }
+
+        public static OrExpression operator |(OrExpression rhs, int tokenid)
+        {
+            rhs.grammar.Create(tokenid, rhs);
+            return rhs;
+        }
+
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();

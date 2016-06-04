@@ -88,10 +88,6 @@
       <Project>{7e351b42-9fc8-40b5-b15c-114d93987875}</Project>
       <Name>CSGrammar</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PBGrammar\PBGrammar.csproj">
-      <Project>{fe8a05ef-71ed-4017-ba48-d7b01cf206d4}</Project>
-      <Name>PBGrammar</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

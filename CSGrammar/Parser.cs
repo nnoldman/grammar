@@ -91,54 +91,110 @@ namespace CSGrammar
             //new KeyWord(){WordType= TokenID.Equal,Word="="},
         };
 
-        void LoadFunction(Grammar g)
-        {
-            g.Or("op").IsOneOf("+", "-", "*", "/");
-            g.Or("op2").IsOneOf("+=", "-=", "*=", "/=");
-
-            g.And("vr1").Is(Arg.P("OP", "<op>"), Arg.P("VR", Grammar.ID)).Array();
-
-            g.And("vr3").Is(Arg.P("V", Grammar.ID), Arg.P("R", "<vr1>"));
-
-            g.Or("right_exp").IsOneOf("<vr3>", Arg.P("V", Grammar.ID));
-
-            g.And("declaration").Is(Arg.P("T", "<type>"), Arg.P("V", Grammar.ID));
-            
-            g.Or("left_exp").IsOneOf("<declaration>", Grammar.ID);
-
-            g.And("exp1").Is(Arg.P("LE", "<left_exp>"), "=", Arg.P("RE", "<right_exp>"), ";");
-
-            g.And("exp2").Is(Arg.P("LE", Grammar.ID), Arg.P("OP", "<op2>"), Arg.P("RE", "<right_exp>"), ";");
-
-            g.And("return").Is(TokenID.Return, "<right_exp>", ";");
-
-            g.Or("fun_body").IsOneOf("<exp1>", "<exp2>", "<return>", Grammar.Empty).Array();
-        }
-
         void Loader(Grammar g)
         {
-            g.Or("permission").IsOneOf(TokenID.Permission, Grammar.Empty);
-            g.Or("memory").IsOneOf(TokenID.Memory, Grammar.Empty);
-            g.Or("type").IsOneOf(TokenID.InnerType, Grammar.ID);
+            var V_B = g.And("V_B");
+            var Var = g.Or("Var");
+            var Var_B = g.And("Var_B");
+            var Vars = g.Or("Vars");
+            var Vars2 = g.And("Vars2");
+            var Varss = g.Or("Varss");
 
-            g.Or("arg_ter").IsOneOf(",", Grammar.Empty);
-            g.And("arg").Is(Arg.P("type", "<type>"), Arg.P("name", Grammar.ID), "<arg_ter>");
-            g.Or("args").IsOneOf("<arg>", Grammar.Empty).Array();
+            var OP1 = g.Or("OP1");
+            var OP2 = g.Or("OP2");
+            var Var_R = g.And("Var_R");
+            var Var_Com = g.And("Var_Com");
+            var RightExp = g.Or("RightExp");
+            var RightExp1 = g.Or("RightExp1");
+            var RightExp2 = g.And("RightExp2");
+            var LeftExp = g.Or("LeftExp");
+            var Exp1 = g.And("Exp1");
+            var Exp2 = g.And("Exp2");
+            var Decl = g.And("Decl");
+            var Return = g.And("Return");
+            var FunBody = g.Or("FunBody");
+            var FunArg = g.And("FunArg");
+            var Permission = g.Or("Permission");
+            var Memory = g.Or("Memory");
+            var VType = g.Or("VType");
+            var Argument = g.And("Argument");
+            var Arguments = g.Or("Arguments");
+            var Fun = g.And("Fun");
+            var Member1 = g.And("Member1");
+            var Member2 = g.And("Member2");
+            var ClassBody = g.Or("ClassBody");
+            var Class = g.And("Class");
+            var Root = g.SectionOr("Root");
 
-            LoadFunction(g);
+            Permission.IsOneOf(TokenID.Permission, Grammar.Empty);
+            Memory.IsOneOf(TokenID.Memory, Grammar.Empty);
+            VType.IsOneOf(TokenID.InnerType, Grammar.ID);
 
-            g.And("fun").Is(Arg.P("Per","<permission>")
-                , "<memory>"
-                , Arg.P("ret", "<type>")
-                , Arg.P("name", Grammar.ID)
-                , "(", "<args>", ")"
-                , "{", "<fun_body>", "}");
+            var ArgFirst = g.And("ArgFirst");
+            var ArgTrial = g.And("ArgTrial");
 
-            g.And("member1").Is(Arg.P("Per", "<permission>"), "<memory>", Arg.P("type", "<type>"), Arg.P("name", Grammar.ID), ";");
-            g.Or("class_body").IsOneOf("<member1>", "<fun>", Grammar.Empty).Array();
+            ArgFirst.Is(Arg.P("ArgType", VType), Arg.P("ArgV", Grammar.ID));
+            ArgTrial.Is(",", Arg.P("ArgType", VType), Arg.P("ArgV", Grammar.ID)).Array();
 
-            g.And("class").Is("<permission>", TokenID.Class, Arg.P("name", Grammar.ID), "{", "<class_body>", "}");
-            g.SecOr("grammar").IsOneOf("<class>").Array();
+            Argument.Is(ArgFirst, ArgTrial);
+
+            Arguments.IsOneOf(Grammar.Empty, Argument);
+
+            ///function
+            {
+                OP1.IsOneOf("+", "-", "*", "/");
+
+                OP2.IsOneOf("+=", "-=", "*=", "/=");
+
+                V_B.Is(Arg.P("(", "("), Grammar.ID, Arg.P(")", ")"));
+
+                Var.IsOneOf(Grammar.ID, Arg.P("V", V_B));
+
+                Var_B.Is(Arg.P("LB", "("), Var, Arg.P("Op", OP1), Var, Arg.P("RB", ")"));
+
+                Vars.IsOneOf(Var, Var_B);
+
+                Vars2.Is(Arg.P("LB", "("), Vars, Arg.P("Op", OP1), Vars, Arg.P("RB", ")"));
+
+                Varss.IsOneOf(Vars, Vars2);
+
+                Var_R.Is(Arg.P("Op", OP1), Arg.P("V", Varss)).Array();
+
+                Var_Com.Is(Arg.P("V", Varss), Arg.P("R", Var_R));
+
+                RightExp1.IsOneOf(Var_Com, Arg.P("V", Grammar.ID));
+
+                RightExp2.Is(Arg.P("(", "("), RightExp1, Arg.P(")", ")"));
+
+                RightExp.IsOneOf(RightExp1, RightExp2);
+
+                Decl.Is(Arg.P("T", VType), Arg.P("V", Grammar.ID));
+
+                LeftExp.IsOneOf(Decl, Arg.P("VL", Grammar.ID));
+
+                Exp1.Is(Arg.P("LeftExp", LeftExp), "=", Arg.P("RightExp", RightExp), ";");
+
+                Exp2.Is(Arg.P("LeftExp", Grammar.ID), Arg.P("OP2", OP2), Arg.P("RightExp", RightExp), ";");
+
+                Return.Is(TokenID.Return, RightExp, ";");
+
+                FunBody.IsOneOf(Exp1, Exp2, Return, Grammar.Empty).Array();
+            }
+
+            Fun.Is(Arg.P("Per", Permission)
+                , Arg.P("Memory", Memory)
+                , Arg.P("RET", VType)
+                , Arg.P("Name", Grammar.ID)
+                , "(", Arguments, ")"
+                , "{", FunBody, "}");
+
+            Member1.Is(Arg.P("Per", Permission), Memory, Arg.P("Type", VType), Arg.P("Name", Grammar.ID), ";");
+
+            ClassBody.IsOneOf(Member1, Fun, Grammar.Empty).Array();
+
+            Class.Is(Permission, TokenID.Class, Arg.P("Name", Grammar.ID), "{", ClassBody, "}");
+
+            Root.IsOneOf(Class).Array();
         }
 
         public GrammarTree Load(Action<string> messageHandler, string content)

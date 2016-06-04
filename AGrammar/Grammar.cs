@@ -15,7 +15,7 @@ namespace AGrammar
         static readonly Type mTypeString = typeof(string);
         static readonly Type mTypeInt = typeof(int);
         static readonly Type mTypeProperty = typeof(Arg.ArgProp);
-        static readonly Type mTypeSeg = typeof(AndExpression);
+        static readonly Type mTypeCompisiteExpression = typeof(CompositeExpression);
         static readonly Type mTypeExp = typeof(Expression);
         static readonly Type mTypeEmpty = typeof(EmptyExpression);
 
@@ -24,8 +24,6 @@ namespace AGrammar
         /// </summary>
         public const int ID = 0;
         public static int InvalidTokenType = -1;
-
-        public bool Erroring = false;
 
         Action<string> mMessageHandler;
         KeyWord[] mExternTokens;
@@ -146,7 +144,6 @@ namespace AGrammar
             this.mExternTokens = tokens;
             this.mMessageHandler = handler;
             this.mScanner.ErrorHandler = handler;
-            Erroring = false;
 
             LoadExpressions(loader);
 
@@ -232,11 +229,11 @@ namespace AGrammar
             return (T)seg;
         }
 
-        public OrExpression SecOr(string name)
+        public OrExpression SectionOr(string name)
         {
             return Sec<OrExpression>(name);
         }
-        public AndExpression SecAnd(string name)
+        public AndExpression SectionAnd(string name)
         {
             return Sec<AndExpression>(name);
         }
@@ -249,6 +246,7 @@ namespace AGrammar
         {
             return TryGetAndCreate<OrExpression>(name);
         }
+
         /// <summary>
         /// add and exp
         /// </summary>
@@ -286,11 +284,11 @@ namespace AGrammar
             {
                 return Create((Arg.ArgProp)arg, parent);
             }
-            else if (tp == mTypeSeg)
+            else if (tp.IsSubclassOf(mTypeCompisiteExpression))
             {
                 if (parent)
-                    parent.AddChildren((AndExpression)arg);
-                return (AndExpression)arg;
+                    parent.AddChildren((CompositeExpression)arg);
+                return (CompositeExpression)arg;
             }
             else if (tp == mTypeEmpty)
             {
