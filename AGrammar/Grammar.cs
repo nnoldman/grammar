@@ -6,6 +6,10 @@ using System.Text;
 using System.Threading.Tasks;
 namespace AGrammar
 {
+    internal class FrameError
+    {
+        internal List<Token> errors = new List<Token>();
+    }
     public class Grammar
     {
         static readonly Type mTypeString = typeof(string);
@@ -31,6 +35,8 @@ namespace AGrammar
         Dictionary<string, CompositeExpression> mSegments;
         Dictionary<string, CompositeExpression> mSections;
         GrammarTree mTree = new GrammarTree();
+
+        Dictionary<int, List<Token>> mErrorStack = new Dictionary<int, List<Token>>();
 
         public static EmptyExpression Empty
         {
@@ -76,7 +82,32 @@ namespace AGrammar
             if (mMessageHandler != null)
                 mMessageHandler(msg);
         }
-        internal void Error(Token token)
+
+        static int mErrorID;
+
+        internal void PushError(int errid, Token token)
+        {
+            mErrorStack[errid].Add(token);
+        }
+        internal int RequireErrorID()
+        {
+            mErrorID++;
+            mErrorStack.Add(mErrorID, new List<Token>());
+            return mErrorID;
+        }
+        internal void PopError(int errorID)
+        {
+            List<int> removeKeys = new List<int>();
+            foreach (var i in mErrorStack)
+            {
+                if (i.Key > errorID)
+                    removeKeys.Add(i.Key);
+            }
+            foreach (var i in removeKeys)
+                mErrorStack.Remove(i);
+            mErrorStack.Remove(errorID);
+        }
+        void Error(Token token)
         {
             Error(string.Format("Load Error:{0}", token.ToString()));
         }
@@ -122,7 +153,10 @@ namespace AGrammar
             DateTime t0 = DateTime.Now;
 
             mTokens = mScanner.Scan(mExternTokens, content);
+
             mTree = GenerateTree();
+
+            ErrorReport();
 
             TimeSpan span = new TimeSpan(DateTime.Now.Ticks - t0.Ticks);
 
@@ -131,6 +165,34 @@ namespace AGrammar
 
             return mTree;
         }
+
+        void ErrorReport()
+        {
+            if (mErrorStack.Count == 0)
+                return;
+            
+            int index = 0;
+
+            foreach (var i in mErrorStack)
+            {
+                if (i.Key > index)
+                    index = i.Key;
+            }
+            List<Token> errors = mErrorStack[index];
+            errors.Sort(SortError);
+            Error(errors[0].Error());
+        }
+
+        int SortError(Token a, Token b)
+        {
+            if (a.Line == b.Line && a.Column == b.Column)
+                return 0;
+            if (a.Line > b.Line || (a.Line == b.Line && a.Column > b.Column))
+                return 1;
+            return -1;
+            throw new Exception();
+        }
+
         GrammarTree GenerateTree()
         {
             GrammarTree tree = new GrammarTree();

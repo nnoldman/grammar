@@ -33,6 +33,13 @@ namespace AGrammar
             exp.parent = this.parent;
             return exp;
         }
+
+        internal override bool FastMatch(int start, ref int offset)
+        {
+            if(this.next)
+                return this.next.FastMatch(start, ref  offset);
+            return true;
+        }
     }
 
 }

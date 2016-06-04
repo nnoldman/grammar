@@ -28,6 +28,8 @@ namespace AGrammar
             if (IsGrammarEnd(idx))
                 return true;
 
+            int eid = grammar.RequireErrorID();
+
             do
             {
                 if (this.next && count == Count.Array && this.next.FastMatch(start, ref offset))
@@ -41,6 +43,7 @@ namespace AGrammar
                     {
                         if (!child.Match(start, ref offset, childProp, propName))
                         {
+                            grammar.PushError(eid, grammar.Tokens[start + offset]);
                             return false;
                         }
                     }
@@ -68,6 +71,8 @@ namespace AGrammar
 
             } while (this.next && count == Count.Array && !IsGrammarEnd(start + offset));
 
+            grammar.PopError(eid);
+
             return true;
         }
 
@@ -77,7 +82,7 @@ namespace AGrammar
             {
                 if (arg == null)
                 {
-                    grammar.Error(name + ": Arg can not null");
+                    grammar.Error(name + ": Arg can not be null");
                     return null;
                 }
                 var tp = arg.GetType();

@@ -3,18 +3,33 @@ grammar
     class
     {
         name:TestCSGrammar
+        fun
+        {
+            ret:int
+            name:CX
+            return
+            {
+                vr3
+                {
+                    V:0
+                }
+            }
+        }
         member1
         {
+            Per:public
             type:int
             name:id
         }
         member1
         {
+            Per:public
             type:string
             name:name
         }
         fun
         {
+            Per:public
             ret:void
             name:Count1
             arg
@@ -25,6 +40,7 @@ grammar
         }
         fun
         {
+            Per:public
             ret:void
             name:Count0
             arg
@@ -46,7 +62,7 @@ grammar
                 }
                 RE
                 {
-                    RE:6
+                    V:6
                 }
             }
             exp1
@@ -58,7 +74,7 @@ grammar
                 }
                 RE
                 {
-                    RE:a
+                    V:a
                     R
                     {
                         OP:-
@@ -75,7 +91,7 @@ grammar
                 }
                 RE
                 {
-                    RE:3
+                    V:3
                 }
             }
             exp1
@@ -87,7 +103,7 @@ grammar
                 }
                 RE
                 {
-                    RE:10
+                    V:10
                     R
                     {
                         OP:*
@@ -100,7 +116,7 @@ grammar
                 LE:b
                 RE
                 {
-                    RE:a
+                    V:a
                     R
                     {
                         OP:/
@@ -144,7 +160,7 @@ grammar
                 OP:+=
                 RE
                 {
-                    RE:a
+                    V:a
                     R
                     {
                         OP:/
@@ -179,6 +195,29 @@ grammar
                     {
                         OP:*
                         VR:e
+                    }
+                }
+            }
+        }
+        fun
+        {
+            Per:public
+            ret:int
+            name:Count3
+            arg
+            {
+                type:int
+                name:a
+            }
+            return
+            {
+                vr3
+                {
+                    V:a
+                    R
+                    {
+                        OP:+
+                        VR:2
                     }
                 }
             }

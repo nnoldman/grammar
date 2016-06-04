@@ -43,6 +43,7 @@ namespace CSGrammar
             public const int Op = 21;
             public const int Equal2 = 22;
             public const int Op2 = 23;
+            public const int Return = 24;
         }
         static KeyWord[] Tokens = new KeyWord[]
         {
@@ -67,6 +68,8 @@ namespace CSGrammar
             new KeyWord(){WordType= TokenID.InnerType,Word="double"},
             new KeyWord(){WordType= TokenID.InnerType,Word="long"},
             new KeyWord(){WordType= TokenID.InnerType,Word="ulong"},
+            
+            new KeyWord(){WordType= TokenID.Return,Word="return"},
             
             //new KeyWord(){WordType= TokenID.Op,Word="+"},
             //new KeyWord(){WordType= TokenID.Op,Word="-"},
@@ -95,9 +98,9 @@ namespace CSGrammar
 
             g.And("vr1").Is(Arg.P("OP", "<op>"), Arg.P("VR", Grammar.ID)).Array();
 
-            g.And("vr3").Is(Grammar.ID, Arg.P("R", "<vr1>"));
+            g.And("vr3").Is(Arg.P("V", Grammar.ID), Arg.P("R", "<vr1>"));
 
-            g.Or("right_exp").IsOneOf("<vr3>", Grammar.ID);
+            g.Or("right_exp").IsOneOf("<vr3>", Arg.P("V", Grammar.ID));
 
             g.And("declaration").Is(Arg.P("T", "<type>"), Arg.P("V", Grammar.ID));
             
@@ -107,7 +110,9 @@ namespace CSGrammar
 
             g.And("exp2").Is(Arg.P("LE", Grammar.ID), Arg.P("OP", "<op2>"), Arg.P("RE", "<right_exp>"), ";");
 
-            g.Or("fun_body").IsOneOf("<exp1>", "<exp2>", Grammar.Empty).Array();
+            g.And("return").Is(TokenID.Return, "<right_exp>", ";");
+
+            g.Or("fun_body").IsOneOf("<exp1>", "<exp2>", "<return>", Grammar.Empty).Array();
         }
 
         void Loader(Grammar g)
@@ -122,14 +127,14 @@ namespace CSGrammar
 
             LoadFunction(g);
 
-            g.And("fun").Is("<permission>"
+            g.And("fun").Is(Arg.P("Per","<permission>")
                 , "<memory>"
                 , Arg.P("ret", "<type>")
                 , Arg.P("name", Grammar.ID)
                 , "(", "<args>", ")"
                 , "{", "<fun_body>", "}");
 
-            g.And("member1").Is("<permission>", "<memory>", Arg.P("type", "<type>"), Arg.P("name", Grammar.ID), ";");
+            g.And("member1").Is(Arg.P("Per", "<permission>"), "<memory>", Arg.P("type", "<type>"), Arg.P("name", Grammar.ID), ";");
             g.Or("class_body").IsOneOf("<member1>", "<fun>", Grammar.Empty).Array();
 
             g.And("class").Is("<permission>", TokenID.Class, Arg.P("name", Grammar.ID), "{", "<class_body>", "}");
