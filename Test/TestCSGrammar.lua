@@ -37,7 +37,7 @@ grammar
                 type:string
                 name:y2
             }
-            exp
+            exp1
             {
                 LE
                 {
@@ -46,10 +46,10 @@ grammar
                 }
                 RE
                 {
-                    VL:6
+                    RE:6
                 }
             }
-            exp
+            exp1
             {
                 LE
                 {
@@ -58,18 +58,15 @@ grammar
                 }
                 RE
                 {
-                    VL:a
-                    VR
+                    RE:a
+                    R
                     {
-                        VR:-
-                    }
-                    VR
-                    {
+                        OP:-
                         VR:4
                     }
                 }
             }
-            exp
+            exp1
             {
                 LE
                 {
@@ -78,10 +75,10 @@ grammar
                 }
                 RE
                 {
-                    VL:3
+                    RE:3
                 }
             }
-            exp
+            exp1
             {
                 LE
                 {
@@ -90,80 +87,97 @@ grammar
                 }
                 RE
                 {
-                    VL:10
-                    VR
+                    RE:10
+                    R
                     {
-                        VR:*
-                    }
-                    VR
-                    {
+                        OP:*
                         VR:6
                     }
                 }
             }
-            exp
+            exp1
             {
-                LE
-                {
-                    V:b
-                }
+                LE:b
                 RE
                 {
-                    VL:a
-                    VR
+                    RE:a
+                    R
                     {
-                        VR:/
-                    }
-                    VR
-                    {
+                        OP:/
                         VR:b
                     }
-                    VR
+                    R
                     {
-                        VR:+
-                    }
-                    VR
-                    {
+                        OP:+
                         VR:5
                     }
-                    VR
+                    R
                     {
-                        VR:*
-                    }
-                    VR
-                    {
+                        OP:*
                         VR:a
                     }
-                    VR
+                    R
                     {
-                        VR:*
-                    }
-                    VR
-                    {
+                        OP:*
                         VR:b
                     }
-                    VR
+                    R
                     {
-                        VR:*
-                    }
-                    VR
-                    {
+                        OP:*
                         VR:d
                     }
-                    VR
+                    R
                     {
-                        VR:/
-                    }
-                    VR
-                    {
+                        OP:/
                         VR:3
                     }
-                    VR
+                    R
                     {
-                        VR:*
+                        OP:*
+                        VR:e
                     }
-                    VR
+                }
+            }
+            exp2
+            {
+                LE:d
+                OP:+=
+                RE
+                {
+                    RE:a
+                    R
                     {
+                        OP:/
+                        VR:b
+                    }
+                    R
+                    {
+                        OP:+
+                        VR:5
+                    }
+                    R
+                    {
+                        OP:*
+                        VR:a
+                    }
+                    R
+                    {
+                        OP:*
+                        VR:b
+                    }
+                    R
+                    {
+                        OP:*
+                        VR:d
+                    }
+                    R
+                    {
+                        OP:/
+                        VR:3
+                    }
+                    R
+                    {
+                        OP:*
                         VR:e
                     }
                 }

@@ -19,6 +19,7 @@ namespace AGrammar
         /// Extern token id can not be 0.
         /// </summary>
         public const int ID = 0;
+        public static int InvalidTokenType = -1;
 
         public bool Erroring = false;
 
@@ -245,15 +246,6 @@ namespace AGrammar
             return seg;
         }
 
-        string GetContent(int tokenid)
-        {
-            foreach (var param in mExternTokens)
-            {
-                if (param.WordType == tokenid)
-                    return param.Word;
-            }
-            return string.Empty;
-        }
         void LoadExpressions(Action<Grammar> loader)
         {
             if (mSections.Count == 0 && loader != null)
@@ -266,8 +258,7 @@ namespace AGrammar
         Expression Create(int arg, CompositeExpression parent)
         {
             Expression exp = new Expression();
-            exp.tokenType = arg;
-            //exp.content = GetContent(arg);
+            exp.myToken.type = arg;
             if (parent)
                 parent.AddChildren(exp);
             return exp;
@@ -303,8 +294,7 @@ namespace AGrammar
                 }
             }
             Expression exp = new Expression();
-            exp.content = arg;
-
+            exp.myToken.content = arg;
             if (parent)
             {
                 exp.grammar = parent.grammar;
@@ -320,7 +310,7 @@ namespace AGrammar
             if (arg.exp is int)
             {
                 Expression executer = new Expression();
-                executer.tokenType = (int)arg.exp;
+                executer.myToken.type = (int)arg.exp;
                 exp.executer = executer;
             }
             else if (arg.exp is string)
@@ -343,7 +333,7 @@ namespace AGrammar
                 else
                 {
                     Expression executer = new Expression();
-                    executer.content = name;
+                    executer.myToken.content = name;
                     exp.executer = executer;
                 }
             }

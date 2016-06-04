@@ -23,9 +23,9 @@ public class Tester
 
     public static void TestPBGrammar()
     {
-        //PBGrammar.Parser p = new PBGrammar.Parser();
-        //string content = File.ReadAllText("commondData.proto");
-        //p.Load(HandleMessage, content);
-        //p.Dump("TestPBGrammar.lua");
+        PBGrammar.Parser p = new PBGrammar.Parser();
+        string content = File.ReadAllText("commondData.proto");
+        p.Load(HandleMessage, content);
+        p.Dump("TestPBGrammar.lua");
     }
 }

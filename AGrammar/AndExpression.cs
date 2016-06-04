@@ -28,38 +28,47 @@ namespace AGrammar
             if (IsGrammarEnd(idx))
                 return true;
 
-            if (mChildren.Count > 0)
+            do
             {
-                GrammarTree childProp = new GrammarTree();
-                childProp.propName = propName.Length > 0 ? propName : name;
-                foreach (var child in mChildren)
+                if (this.next && count == Count.Array && this.next.FastMatch(start, ref offset))
+                    return true;
+
+                if (mChildren.Count > 0)
                 {
-                    if (!child.Match(start, ref offset, childProp, propName))
+                    GrammarTree childProp = new GrammarTree();
+                    childProp.propName = propName.Length > 0 ? propName : name;
+                    foreach (var child in mChildren)
+                    {
+                        if (!child.Match(start, ref offset, childProp, propName))
+                        {
+                            return false;
+                        }
+                    }
+                    parent.propertices.Add(childProp);
+                }
+                else
+                {
+                    Token token = grammar.Tokens[idx];
+                    if (this.myToken.Match(token))
+                    {
+                        if (propName.Length > 0)
+                        {
+                            PropertyTreeNode prop = new PropertyTreeNode();
+                            prop.propName = propName;
+                            prop.content = token.Word;
+                            parent.propertices.Add(prop);
+                        }
+                        offset++;
+                    }
+                    else
                     {
                         return false;
                     }
                 }
-                parent.propertices.Add(childProp);
-                return true;
-            }
-            else
-            {
-                Token token = grammar.Tokens[idx];
-                if ((InvalidTokenType != tokenType && token.WordType == tokenType) || token.Word == content)
-                {
-                    if (propName.Length > 0)
-                    {
-                        PropertyTreeNode prop = new PropertyTreeNode();
-                        prop.propName = propName;
-                        prop.content = token.Word;
-                        parent.propertices.Add(prop);
-                    }
-                    offset++;
-                    return true;
-                }
-            }
-            grammar.Error(grammar.Tokens[start + offset]);
-            return false;
+
+            } while (this.next && count == Count.Array && !IsGrammarEnd(start + offset));
+
+            return true;
         }
 
         public CompositeExpression Is(params object[] para)
@@ -76,14 +85,14 @@ namespace AGrammar
             }
             return this;
         }
-        internal AndExpression(string name)
-        {
-            this.name = name;
-        }
-        internal AndExpression(int tokenID)
-        {
-            this.tokenType = tokenID;
-        }
+        //internal AndExpression(string name)
+        //{
+        //    this.name = name;
+        //}
+        //internal AndExpression(int tokenID)
+        //{
+        //    this.tokenType = tokenID;
+        //}
 
         public override string ToString()
         {
@@ -115,9 +124,8 @@ namespace AGrammar
                 exp.children.Add(newchild);
             });
             exp.name = this.name;
-            exp.tokenType = this.tokenType;
-            exp.content = this.content;
-            exp.countType = this.countType;
+            exp.myToken = this.myToken;
+            exp.count = this.count;
             exp.grammar = this.grammar;
             return exp;
         }

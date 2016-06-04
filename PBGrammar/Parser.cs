@@ -24,7 +24,6 @@ namespace PBGrammar
         }
         static KeyWord[] Tokens = new KeyWord[]
         {
-            new KeyWord(){WordType= TokenType.Comment,Word="//"},
             new KeyWord(){WordType= TokenType.Package,Word="package"},
             new KeyWord(){WordType= TokenType.Message,Word="message"},
             new KeyWord(){WordType= TokenType.TypeName,Word="int32"},

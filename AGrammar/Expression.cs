@@ -6,22 +6,67 @@ using System.Text;
 
 namespace AGrammar
 {
-    public enum CountType
+    public enum Count
     {
         One,
         Array,
     }
+    public enum TokenUsage
+    {
+        None,
+        Type,
+        Content,
+    }
+
+    public class EasyToken
+    {
+        public string content
+        {
+            get
+            {
+                return mContent;
+            }
+            set
+            {
+                mContent = value;
+                mUsage = TokenUsage.Content;
+            }
+        }
+        public int type
+        {
+            get
+            {
+                return mType;
+            }
+            set
+            {
+                mType = value;
+                mUsage = TokenUsage.Type;
+            }
+        }
+        public TokenUsage usage
+        {
+            get
+            {
+                return mUsage;
+            }
+        }
+        internal bool Match(Token token)
+        {
+            return mUsage == TokenUsage.Type ? mType == token.WordType : mContent == token.Word;
+        }
+        int mType = Grammar.InvalidTokenType;
+        TokenUsage mUsage = TokenUsage.None;
+        string mContent;
+    }
 
     public class Expression : BoolObject
     {
-        public static int InvalidTokenType = -1;
-
-        public int tokenType = InvalidTokenType;
-        public string content = string.Empty;
+        public EasyToken myToken = new EasyToken();
         public CompositeExpression parent;
         public Expression next;
         public Grammar grammar;
-        public CountType countType = CountType.One;
+        public Count count = Count.One;
 
         internal Expression()
         {
@@ -31,9 +76,8 @@ namespace AGrammar
         public virtual Expression Copy()
         {
             Expression exp = new Expression();
-            exp.tokenType = this.tokenType;
-            exp.content = this.content;
-            exp.countType = this.countType;
+            exp.myToken = this.myToken;
+            exp.count = this.count;
             exp.grammar = this.grammar;
             return exp;
         }
@@ -49,15 +93,15 @@ namespace AGrammar
             if (IsGrammarEnd(idx))
                 return true;
             Token token = grammar.Tokens[idx];
-            return (InvalidTokenType != tokenType && tokenType == token.WordType) || content == token.Word;
+            return this.myToken.Match(token);
         }
 
         public override string ToString()
         {
-            if (!string.IsNullOrEmpty(content))
-                return content;
+            if (!string.IsNullOrEmpty(myToken.content))
+                return myToken.content;
             else
-                return tokenType == Grammar.ID ? "ID" : tokenType.ToString();
+                return myToken.type == Grammar.ID ? "ID" : myToken.type.ToString();
         }
         internal bool IsGrammarEnd(int idx)
         {
@@ -71,7 +115,7 @@ namespace AGrammar
 
             Token token = grammar.Tokens[idx];
 
-            if ((InvalidTokenType != tokenType && tokenType == token.WordType) || content == token.Word)
+            if (this.myToken.Match(token))
             {
                 if (!string.IsNullOrEmpty(propName))
                 {

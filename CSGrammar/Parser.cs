@@ -39,10 +39,14 @@ namespace CSGrammar
             public const int Continue = 17;
             public const int Var = 18;
             public const int Const = 19;
+            public const int Equal = 20;
+            public const int Op = 21;
+            public const int Equal2 = 22;
+            public const int Op2 = 23;
         }
         static KeyWord[] Tokens = new KeyWord[]
         {
-            new KeyWord(){WordType= TokenID.Comment,Word="//"},
+            //new KeyWord(){WordType= TokenID.Comment,Word="//"},
             new KeyWord(){WordType= TokenID.Using,Word="using"},
             new KeyWord(){WordType= TokenID.Namespace,Word="namespace"},
             new KeyWord(){WordType= TokenID.Class,Word="class"},
@@ -63,29 +67,47 @@ namespace CSGrammar
             new KeyWord(){WordType= TokenID.InnerType,Word="double"},
             new KeyWord(){WordType= TokenID.InnerType,Word="long"},
             new KeyWord(){WordType= TokenID.InnerType,Word="ulong"},
+            
+            //new KeyWord(){WordType= TokenID.Op,Word="+"},
+            //new KeyWord(){WordType= TokenID.Op,Word="-"},
+            //new KeyWord(){WordType= TokenID.Op,Word="*"},
+            //new KeyWord(){WordType= TokenID.Op,Word="/"},
+
+            //new KeyWord(){WordType= TokenID.Equal2,Word="+="},
+            //new KeyWord(){WordType= TokenID.Equal2,Word="-="},
+            //new KeyWord(){WordType= TokenID.Equal2,Word="*="},
+            //new KeyWord(){WordType= TokenID.Equal2,Word="/="},
+
+            //new KeyWord(){WordType= TokenID.Op2,Word="||"},
+            //new KeyWord(){WordType= TokenID.Op2,Word="&&"},
+            //new KeyWord(){WordType= TokenID.Op2,Word="=="},
+            //new KeyWord(){WordType= TokenID.Op2,Word="!="},
+            //new KeyWord(){WordType= TokenID.Op2,Word="++"},
+            //new KeyWord(){WordType= TokenID.Op2,Word="--"},
+
+            //new KeyWord(){WordType= TokenID.Equal,Word="="},
         };
 
         void LoadFunction(Grammar g)
         {
             g.Or("op").IsOneOf("+", "-", "*", "/");
+            g.Or("op2").IsOneOf("+=", "-=", "*=", "/=");
 
-            g.And("vr1").Is(Arg.P("VL", Grammar.ID), Arg.P("OP", "<op>"), Arg.P("VR", Grammar.ID));
-            g.Or("vr2").IsOneOf(Grammar.ID, "<vr1>");
-            g.And("vr3").Is(Arg.P("OP", "<op>"), Arg.P("VR", "<vr2>"));
+            g.And("vr1").Is(Arg.P("OP", "<op>"), Arg.P("VR", Grammar.ID)).Array();
 
-            g.Or("vr4").IsOneOf(Arg.P("VR", "<vr3>")).Array();
+            g.And("vr3").Is(Grammar.ID, Arg.P("R", "<vr1>"));
 
-            g.And("vr5").Is(Arg.P("VL", "<vr2>"), Arg.P("VR", "<vr4>"));
-
-            g.Or("right_exp").IsOneOf("<vr5>", Grammar.ID);
+            g.Or("right_exp").IsOneOf("<vr3>", Grammar.ID);
 
             g.And("declaration").Is(Arg.P("T", "<type>"), Arg.P("V", Grammar.ID));
             
             g.Or("left_exp").IsOneOf("<declaration>", Grammar.ID);
 
-            g.And("exp").Is(Arg.P("LE", "<left_exp>"), "=", Arg.P("RE", "<right_exp>"), ";");
+            g.And("exp1").Is(Arg.P("LE", "<left_exp>"), "=", Arg.P("RE", "<right_exp>"), ";");
 
-            g.Or("fun_body").IsOneOf("<exp>", Grammar.Empty).Array();
+            g.And("exp2").Is(Arg.P("LE", Grammar.ID), Arg.P("OP", "<op2>"), Arg.P("RE", "<right_exp>"), ";");
+
+            g.Or("fun_body").IsOneOf("<exp1>", "<exp2>", Grammar.Empty).Array();
         }
 
         void Loader(Grammar g)

@@ -40,5 +40,10 @@ namespace AGrammar
         {
             throw new Exception();
         }
+        public CompositeExpression Array()
+        {
+            count = Count.Array;
+            return this;
+        }
     }
 }

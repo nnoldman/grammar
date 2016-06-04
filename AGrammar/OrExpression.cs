@@ -64,7 +64,7 @@ namespace AGrammar
 
             do
             {
-                if (this.next && this.next.FastMatch(start, ref offset))
+                if (this.next && count == Count.Array && this.next.FastMatch(start, ref offset))
                     return true;
 
                 if (!MatchOne(start, ref offset, parent, propName))
@@ -76,7 +76,7 @@ namespace AGrammar
                     }
                     return false;
                 }
-            } while (this.next && countType == CountType.Array && !IsGrammarEnd(start + offset));
+            } while (this.next && count == Count.Array && !IsGrammarEnd(start + offset));
 
             return true;
         }
@@ -123,9 +123,8 @@ namespace AGrammar
         {
             OrExpression exp = new OrExpression();
             exp.name = this.name;
-            exp.tokenType = this.tokenType;
-            exp.content = this.content;
-            exp.countType = this.countType;
+            exp.myToken = this.myToken;
+            exp.count = this.count;
             exp.grammar = this.grammar;
 
             this.children.ForEach((child) =>
@@ -152,12 +151,5 @@ namespace AGrammar
             }
             return false;
         }
-
-        public CompositeExpression Array()
-        {
-            countType = CountType.Array;
-            return this;
-        }
     }
-
 }

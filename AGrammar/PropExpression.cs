@@ -43,9 +43,8 @@ namespace AGrammar
         public override Expression Copy()
         {
             PropExpression exp = new PropExpression(this.propertyName, this.parentName);
-            exp.tokenType = this.tokenType;
-            exp.content = this.content;
-            exp.countType = this.countType;
+            exp.myToken = this.myToken;
+            exp.count = this.count;
             exp.grammar = this.grammar;
             exp.executer = this.executer.Copy();
             return exp;

@@ -44,6 +44,13 @@ namespace AGrammar
 
     internal class Scanner
     {
+        enum CommentState
+        {
+            None,
+            Line,
+            Block,
+        }
+
         public Action<string> ErrorHandler;
 
         public string LineComment = "//";
@@ -53,6 +60,8 @@ namespace AGrammar
             "+=", "-=", "*=", "/=","<=", "==","!=", ">=", "||", "&&", "++", "--",
             "+", "-", "*", "/", ".", "=", "?", "(", ")", "{", "}", "[", "]","<",">" ,":", ";", ",", "|", "&",
             };
+
+        Dictionary<string, KeyWord> mKeyWords = new Dictionary<string, KeyWord>();
 
         public string[] Termins
         {
@@ -68,10 +77,6 @@ namespace AGrammar
                 mTermins = rawList.ToArray();
             }
         }
-
-
-
-        Dictionary<string, KeyWord> mTokenMap = new Dictionary<string, KeyWord>();
 
 
         static int SortFunc(string a, string b)
@@ -92,7 +97,7 @@ namespace AGrammar
         }
         public bool Init(KeyWord[] tokens)
         {
-            mTokenMap.Clear();
+            mKeyWords.Clear();
 
             foreach (var item in tokens)
             {
@@ -101,7 +106,7 @@ namespace AGrammar
                     Error("ID 0 is reserver for global id.");
                     return false;
                 }
-                mTokenMap.Add(item.Word, item);
+                mKeyWords.Add(item.Word, item);
             }
             return true;
         }
@@ -120,12 +125,6 @@ namespace AGrammar
             throw new Exception();
         }
 
-        public enum CommentState
-        {
-            None,
-            Line,
-            Block,
-        }
         void Terminate(StringBuilder sb,int line,int col,List<Token> tokens)
         {
             if (sb.Length == 0)
@@ -144,31 +143,22 @@ namespace AGrammar
             t.Column = col;
             tokens.Add(t);
         }
-        void MatchTerminations(ref string content, List<Token> tokens, char ch, int i, StringBuilder sb, int line, int col)
+        bool MatchTerminations(ref string content, List<Token> tokens,int i, StringBuilder sb, int line, int col,out string terimnal)
         {
-            if (ch == '\n' || ch == '\t' || ch == ' ')
+            for (int j = 0; j < mTermins.Length; ++j)
             {
-                Terminate(sb, line, col, tokens);
-            }
-            else
-            {
-                bool hit = false;
+                string ter = mTermins[j];
 
-                for (int j = 0; j < mTermins.Length; ++j)
+                if (Check(content, i, ter))
                 {
-                    string ter = mTermins[j];
-
-                    if (Check(content, i, ter))
-                    {
-                        hit = true;
-                        Terminate(sb, line, col, tokens);
-                        AddTerminate(ter, line, col, tokens);
-                        break;
-                    }
+                    Terminate(sb, line, col, tokens);
+                    AddTerminate(ter, line, col, tokens);
+                    terimnal = ter;
+                    return true;
                 }
-                if (!hit)
-                    sb.Append(ch);
             }
+            terimnal = null;
+            return false;
         }
         public List<Token> Scan(KeyWord[] tokenParams, string content)
         {
@@ -188,9 +178,11 @@ namespace AGrammar
 
             StringBuilder sb = new StringBuilder();
 
-            for (int i = 0; i < len; ++i, ++col)
+            for (int i = 0; i < len; )
             {
                 char ch = content[i];
+
+                int offset = 1;
 
                 switch (commenting)
                 {
@@ -208,7 +200,23 @@ namespace AGrammar
                             }
                             else
                             {
-                                MatchTerminations(ref content, tokens, ch, i, sb, line, col);
+                                if (ch == '\n' || ch == '\t' || ch == ' ')
+                                {
+                                    Terminate(sb, line, col, tokens);
+                                }
+                                else
+                                {
+                                    string ter;
+
+                                    if (MatchTerminations(ref content, tokens, i, sb, line, col, out ter))
+                                    {
+                                        offset = ter.Length;
+                                    }
+                                    else
+                                    {
+                                        sb.Append(ch);
+                                    }
+                                }
                             }
                         }
                         break;
@@ -223,15 +231,18 @@ namespace AGrammar
                             if (Check(content, i, BlockCommentEnd))
                             {
                                 commenting = CommentState.None;
-                                ++i;
+                                offset = BlockCommentEnd.Length;
                             }
                         }
                         break;
                 }
 
+                col += offset;
+                i += offset;
+
                 if (ch == '\n')
                 {
-                    col = 0;
+                    col = 1;
                     line++;
                 }
             }
@@ -240,9 +251,11 @@ namespace AGrammar
 
         private int GetTokenType(string lex)
         {
-            KeyWord result = null;
-            mTokenMap.TryGetValue(lex, out result);
-            return result == null ? 0 : result.WordType;
+            if (mTermins.Contains(lex))
+                return Grammar.InvalidTokenType;
+            KeyWord word = null;
+            mKeyWords.TryGetValue(lex, out word);
+            return word == null ? Grammar.ID : word.WordType;
         }
     }
 }

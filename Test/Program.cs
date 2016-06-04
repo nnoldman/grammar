@@ -19,7 +19,7 @@ namespace Test
             //Application.Run(new Form1());
 
             Tester.TestCSGrammar();
-            //Tester.TestPBGrammar();
+            Tester.TestPBGrammar();
         }
     }
 }
