@@ -29,6 +29,7 @@ namespace AGrammar
             }
         }
 
+
         internal void AddChildren(Expression exp)
         {
             children.Add(exp);
@@ -44,6 +45,11 @@ namespace AGrammar
         {
             count = Count.Array;
             return this;
+        }
+
+        public override string ToString()
+        {
+            return this.name;
         }
     }
 }

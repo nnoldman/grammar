@@ -9,9 +9,12 @@ grammar
             Name:CX
             Return
             {
-                Var_Com
+                
                 {
-                    V:0
+                    V
+                    {
+                        V:0
+                    }
                 }
             }
         }
@@ -76,9 +79,12 @@ grammar
                     T:int
                     V:a
                 }
-                RightExp
+                RExp
                 {
-                    V:6
+                    RExp
+                    {
+                        V:6
+                    }
                 }
             }
             Exp1
@@ -88,13 +94,22 @@ grammar
                     T:int
                     V:b
                 }
-                RightExp
+                RExp
                 {
-                    V:a
-                    R
+                    RExp
                     {
-                        Op:-
-                        V:4
+                        V:a
+                    }
+                    RExp
+                    {
+                        OP3-:-
+                        RExp
+                        {
+                            RExp
+                            {
+                                V:4
+                            }
+                        }
                     }
                 }
             }
@@ -105,9 +120,12 @@ grammar
                     T:int
                     V:d
                 }
-                RightExp
+                RExp
                 {
-                    V:3
+                    RExp
+                    {
+                        V:3
+                    }
                 }
             }
             Exp1
@@ -117,90 +135,109 @@ grammar
                     T:int
                     V:e
                 }
-                RightExp
+                RExp
                 {
-                    V:6
-                    R
+                    RExp
                     {
-                        Op:*
                         V:6
+                    }
+                    RExp
+                    {
+                        OP4*:*
+                        RExp
+                        {
+                            RExp
+                            {
+                                V:6
+                            }
+                        }
                     }
                 }
             }
             Exp1
             {
                 VL:b
-                RightExp
+                RExp
                 {
-                    V:a
-                    R
+                    RExp
                     {
-                        Op:/
-                        V:b
-                    }
-                    R
-                    {
-                        Op:+
-                        V:5
-                    }
-                    R
-                    {
-                        Op:*
                         V:a
                     }
-                    R
+                    RExp
                     {
-                        Op:*
-                        V:b
-                    }
-                    R
-                    {
-                        Op:*
-                        V:d
-                    }
-                    R
-                    {
-                        Op:/
-                        V:3
-                    }
-                    R
-                    {
-                        Op:*
-                        V:e
-                    }
-                }
-            }
-            Exp1
-            {
-                VL:d
-                RightExp
-                {
-                    V:a
-                    R
-                    {
-                        Op:/
-                        V:4
-                    }
-                    R
-                    {
-                        Op:+
-                        V
+                        OP4/:/
+                        RExp
                         {
-                            LB:(
-                            V:b
-                            Op:+
-                            V:5
-                            RB:)
-                        }
-                    }
-                    R
-                    {
-                        Op:+
-                        V
-                        {
-                            (:(
-                            V:3
-                            ):)
+                            RExp
+                            {
+                                V:b
+                            }
+                            RExp
+                            {
+                                OP3+:+
+                                RExp
+                                {
+                                    RExp
+                                    {
+                                        V:5
+                                    }
+                                    RExp
+                                    {
+                                        OP4*:*
+                                        RExp
+                                        {
+                                            RExp
+                                            {
+                                                V:a
+                                            }
+                                            RExp
+                                            {
+                                                OP4*:*
+                                                RExp
+                                                {
+                                                    RExp
+                                                    {
+                                                        V:b
+                                                    }
+                                                    RExp
+                                                    {
+                                                        OP4*:*
+                                                        RExp
+                                                        {
+                                                            RExp
+                                                            {
+                                                                V:d
+                                                            }
+                                                            RExp
+                                                            {
+                                                                OP4/:/
+                                                                RExp
+                                                                {
+                                                                    RExp
+                                                                    {
+                                                                        V:3
+                                                                    }
+                                                                    RExp
+                                                                    {
+                                                                        OP4*:*
+                                                                        RExp
+                                                                        {
+                                                                            RExp
+                                                                            {
+                                                                                V:e
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -221,13 +258,22 @@ grammar
             }
             Return
             {
-                Var_Com
+                
                 {
-                    V:a
-                    R
+                    V
                     {
-                        Op:+
-                        V:2
+                        V:a
+                    }
+                    
+                    {
+                        OP3+:+
+                        
+                        {
+                            V
+                            {
+                                V:2
+                            }
+                        }
                     }
                 }
             }

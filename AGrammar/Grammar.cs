@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,9 +16,8 @@ namespace AGrammar
         static readonly Type mTypeString = typeof(string);
         static readonly Type mTypeInt = typeof(int);
         static readonly Type mTypeProperty = typeof(Arg.ArgProp);
-        static readonly Type mTypeCompisiteExpression = typeof(CompositeExpression);
         static readonly Type mTypeExp = typeof(Expression);
-        static readonly Type mTypeEmpty = typeof(EmptyExpression);
+        static readonly Type mTypeAndArg = typeof(Arg.ArgAnd);
 
         /// <summary>
         /// Extern token id can not be 0.
@@ -145,9 +145,9 @@ namespace AGrammar
             this.mMessageHandler = handler;
             this.mScanner.ErrorHandler = handler;
 
-            LoadExpressions(loader);
-
             DateTime t0 = DateTime.Now;
+
+            LoadExpressions(loader);
 
             mTokens = mScanner.Scan(mExternTokens, content);
 
@@ -167,15 +167,12 @@ namespace AGrammar
         {
             if (mErrorStack.Count == 0)
                 return;
-            
-            int index = 0;
 
+            List<Token> errors = new List<Token>();
             foreach (var i in mErrorStack)
             {
-                if (i.Key > index)
-                    index = i.Key;
+                errors.AddRange(i.Value);
             }
-            List<Token> errors = mErrorStack[index];
             errors.Sort(SortError);
             Error(errors[0].Error());
         }
@@ -185,8 +182,8 @@ namespace AGrammar
             if (a.Line == b.Line && a.Column == b.Column)
                 return 0;
             if (a.Line > b.Line || (a.Line == b.Line && a.Column > b.Column))
-                return 1;
-            return -1;
+                return -1;
+            return 1;
             throw new Exception();
         }
 
@@ -284,17 +281,16 @@ namespace AGrammar
             {
                 return Create((Arg.ArgProp)arg, parent);
             }
-            else if (tp.IsSubclassOf(mTypeCompisiteExpression))
+            else if (tp.IsSubclassOf(mTypeExp))
             {
+                var exp = (Expression)arg;
                 if (parent)
-                    parent.AddChildren((CompositeExpression)arg);
-                return (CompositeExpression)arg;
+                    parent.AddChildren(exp);
+                return exp;
             }
-            else if (tp == mTypeEmpty)
+            else if (tp == mTypeAndArg)
             {
-                if (parent)
-                    parent.AddChildren((EmptyExpression)arg);
-                return (EmptyExpression)arg;
+                return Create((Arg.ArgAnd)arg, parent);
             }
             throw new Exception();
         }
@@ -313,6 +309,18 @@ namespace AGrammar
 
             foreach (var seg in mSections)
                 seg.Value.SetNext();
+
+            SaveSections();
+        }
+
+        void SaveSections()
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (var seg in mSections)
+            {
+                seg.Value.SaveTo(sb, 0);
+            }
+            File.WriteAllBytes("sections.lua",new UTF8Encoding(false).GetBytes(sb.ToString().ToCharArray()));
         }
 
         Expression Create(int arg, CompositeExpression parent)
@@ -323,7 +331,17 @@ namespace AGrammar
                 parent.AddChildren(exp);
             return exp;
         }
-
+        Expression Create(Arg.ArgAnd arg, CompositeExpression parent)
+        {
+            AndExpression aexp = new AndExpression();
+            aexp.grammar = parent.grammar;
+            aexp.Is(arg.args);
+            if (arg.array)
+                aexp.Array();
+            if (parent)
+                parent.AddChildren(aexp);
+            return aexp;
+        }
         static string RightBrack = new string('>', 1);
 
         static bool IsCompositeExpression(string name)
@@ -341,32 +359,27 @@ namespace AGrammar
                 string name = GetCompositeExpName(arg);
 
                 CompositeExpression comExp = parent.grammar.Get(name);
-
-                if (comExp)
-                {
-                    var newComExp = comExp.Copy();
-                    parent.AddChildren(newComExp);
-                    return newComExp;
-                }
-                else
-                {
-                    throw new Exception("Unknown expression " + name);
-                }
+                parent.AddChildren(comExp);
             }
             Expression exp = new Expression();
+
             exp.myToken.content = arg;
+
             if (parent)
             {
                 exp.grammar = parent.grammar;
                 parent.AddChildren(exp);
             }
+
             return exp;
         }
 
         static PropExpression Create(Arg.ArgProp arg, CompositeExpression parent)
         {
             PropExpression exp = new PropExpression(arg.propName, parent.name);
+
             exp.grammar = parent.grammar;
+
             if (arg.exp is int)
             {
                 Expression executer = new Expression();
@@ -376,13 +389,13 @@ namespace AGrammar
             else if (arg.exp is string)
             {
                 string name = (string)arg.exp;
+
                 if (IsCompositeExpression(name))
                 {
                     CompositeExpression comExp = parent.grammar.Get(GetCompositeExpName(name));
 
                     if (comExp)
                     {
-                        var newComExp = comExp.Copy();
                         exp.executer = comExp;
                     }
                     else
@@ -399,7 +412,7 @@ namespace AGrammar
             }
             else if (arg.exp is Expression)
             {
-                exp.executer = (Expression)arg.exp;
+                exp.executer = ((Expression)arg.exp);
             }
             else
             {

@@ -17,9 +17,15 @@ namespace Test
             //Application.EnableVisualStyles();
             //Application.SetCompatibleTextRenderingDefault(false);
             //Application.Run(new Form1());
-
             Tester.TestCSGrammar();
             Tester.TestPBGrammar();
+            int a = 5;
+            int b = 6;
+            int c = 7;
+            int d = 8;
+            int e = 9;
+            int f = 10;
+            int m = (((((((((((((((a + b) + 6) + c) + a) * b) * d) * e) * f) * a) * b) * c) * d) * e) * f) * a);
         }
     }
 }

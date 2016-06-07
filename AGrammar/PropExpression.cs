@@ -40,18 +40,22 @@ namespace AGrammar
             return false;
         }
 
-        public override Expression Copy()
-        {
-            PropExpression exp = new PropExpression(this.propertyName, this.parentName);
-            exp.myToken = this.myToken;
-            exp.count = this.count;
-            exp.grammar = this.grammar;
-            exp.executer = this.executer.Copy();
-            return exp;
-        }
+        //public override Expression Copy()
+        //{
+        //    PropExpression exp = new PropExpression(this.propertyName, this.parentName);
+        //    exp.myToken = this.myToken;
+        //    exp.count = this.count;
+        //    exp.grammar = this.grammar;
+        //    exp.executer = this.executer.Copy();
+        //    return exp;
+        //}
+
 
         internal override void SetNext()
         {
+            if (FirstSetted)
+                return;
+
             base.SetNext();
 
             if (this.next)
@@ -59,6 +63,12 @@ namespace AGrammar
                 this.executer.next = this.next;
                 this.executer.SetNext();
             }
+            FirstSetted = true;
+        }
+
+        public override void SaveTo(StringBuilder sb, int spaceCount)
+        {
+            this.executer.SaveTo(sb, spaceCount);
         }
     }
 }

@@ -1,0 +1,60 @@
+﻿--Tokens
+class Class
+using Using
+public Permission
+protected Permission
+private Permission
+internal Permission
+namespace Namespace
+static Memory
+new New
+void InnerType
+int InnerType
+uint InnerType
+string InnerType
+bool InnerType
+Int64 InnerType
+UInt64 InnerType
+float InnerType
+double InnerType
+long InnerType
+ulong InnerType
+return Return
+( LP
+) RP
+{ LB
+} RB
+= Equal
++ Op1
+- Op1
+* Op1
+/ Op1
+
+
+
+--Expressions
+
+Start=Class
+
+Memory='Static'|Empty
+
+Type='InnerType'|ID
+
+Decl=Type Name
+
+Var1=ID
+
+Var2=LP ID RP
+
+Var3=Var1|Var2
+
+ExpRight1=Array(Op1,Var3)
+
+Exp1=Var3 ExpRight1
+
+Exps=Exp1
+
+ComSeg=LB RB
+
+Class = Permission Memory Type Name LP RP
+

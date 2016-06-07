@@ -14,12 +14,18 @@ namespace AGrammar
 
         internal override void SetNext()
         {
+            if (FirstSetted)
+                return;
+
             base.SetNext();
+
+            FirstSetted = true;
 
             for (int i = 0; i < this.children.Count; ++i)
             {
                 var child = this.children[i];
-                child.SetNext();
+                if (child != this)
+                    child.SetNext();
             }
         }
         internal override bool Match(int start, ref int offset, GrammarTree parent, string propName)
@@ -39,8 +45,9 @@ namespace AGrammar
                 {
                     GrammarTree childProp = new GrammarTree();
                     childProp.propName = propName.Length > 0 ? propName : name;
-                    foreach (var child in mChildren)
+                    for(int i=0;i<mChildren.Count;++i)
                     {
+                        var child = mChildren[i];
                         if (!child.Match(start, ref offset, childProp, propName))
                         {
                             grammar.PushError(eid, grammar.Tokens[start + offset]);
@@ -99,11 +106,6 @@ namespace AGrammar
         //    this.tokenType = tokenID;
         //}
 
-        public override string ToString()
-        {
-            return name;
-        }
-
         internal override Expression GetNextSubling(Expression exp)
         {
             int idx = 0;
@@ -119,20 +121,43 @@ namespace AGrammar
             return this.next;
         }
 
-        public override Expression Copy()
+        public override void SaveTo(StringBuilder sb, int spaceCount)
         {
-            AndExpression exp = new AndExpression();
-            this.children.ForEach((child) =>
+            sb.AppendLine(new string(' ', spaceCount) + this.ToString());
+            sb.AppendLine(new string(' ', spaceCount) + "{");
+            spaceCount += 4;
+            int idx = 0;
+            Expression child = null;
+            if (mChildren.Count > 0)
             {
-                var newchild = child.Copy();
-                newchild.parent = exp;
-                exp.children.Add(newchild);
-            });
-            exp.name = this.name;
-            exp.myToken = this.myToken;
-            exp.count = this.count;
-            exp.grammar = this.grammar;
-            return exp;
+                do
+                {
+                    child = mChildren[idx];
+                    child.SaveTo(sb, spaceCount);
+                    ++idx;
+                    if (idx < mChildren.Count)
+                        sb.Append(" ");
+                    else
+                        break;
+                } while (true);
+            }
+            sb.Append("}");
+            spaceCount -= 4;
         }
+        //public override Expression Copy()
+        //{
+        //    AndExpression exp = new AndExpression();
+        //    this.children.ForEach((child) =>
+        //    {
+        //        var newchild = child.Copy();
+        //        newchild.parent = exp;
+        //        exp.children.Add(newchild);
+        //    });
+        //    exp.name = this.name;
+        //    exp.myToken = this.myToken;
+        //    exp.count = this.count;
+        //    exp.grammar = this.grammar;
+        //    return exp;
+        //}
     }
 }

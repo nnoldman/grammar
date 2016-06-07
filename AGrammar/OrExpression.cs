@@ -40,15 +40,35 @@ namespace AGrammar
             }
             return this;
         }
-
+        public static OrExpression operator |(OrExpression rhs, string tokenid)
+        {
+            rhs.grammar.Create(tokenid, rhs);
+            return rhs;
+        }
+        public static OrExpression operator |(OrExpression rhs, Expression tokenid)
+        {
+            rhs.grammar.Create(tokenid, rhs);
+            return rhs;
+        }
         public static OrExpression operator |(OrExpression rhs, int tokenid)
         {
             rhs.grammar.Create(tokenid, rhs);
             return rhs;
         }
-
+        public static OrExpression operator |(OrExpression rhs, Arg.ArgAnd tokenid)
+        {
+            rhs.grammar.Create(tokenid, rhs);
+            return rhs;
+        }
+        public static OrExpression operator |(OrExpression rhs, Arg.ArgProp tokenid)
+        {
+            rhs.grammar.Create(tokenid, rhs);
+            return rhs;
+        }
         public override string ToString()
         {
+            if (!string.IsNullOrEmpty(name))
+                return name;
             StringBuilder sb = new StringBuilder();
             //sb.Append("<");
             for (int i = 0; i < sublings.Count; ++i)
@@ -107,7 +127,12 @@ namespace AGrammar
         }
         internal override void SetNext()
         {
+            if (FirstSetted)
+                return;
             base.SetNext();
+            FirstSetted = true;
+
+            this.sublings.Reverse();
 
             for (int i = 0; i < this.sublings.Count; ++i)
             {
@@ -128,24 +153,22 @@ namespace AGrammar
             return null;
         }
 
-        public override Expression Copy()
-        {
-            OrExpression exp = new OrExpression();
-            exp.name = this.name;
-            exp.myToken = this.myToken;
-            exp.count = this.count;
-            exp.grammar = this.grammar;
+        //public override Expression Copy()
+        //{
+        //    OrExpression exp = new OrExpression();
+        //    exp.name = this.name;
+        //    exp.myToken = this.myToken;
+        //    exp.count = this.count;
+        //    exp.grammar = this.grammar;
 
-            this.children.ForEach((child) =>
-            {
-                var newchild = child.Copy();
-                newchild.parent = exp;
-                exp.children.Add(newchild);
-            });
-
-
-            return exp;
-        }
+        //    this.children.ForEach((child) =>
+        //    {
+        //        var newchild = child.Copy();
+        //        newchild.parent = exp;
+        //        exp.children.Add(newchild);
+        //    });
+        //    return exp;
+        //}
 
         internal override bool FastMatch(int start, ref int offset)
         {
@@ -159,6 +182,32 @@ namespace AGrammar
                     return true;
             }
             return false;
+        }
+
+        public override void SaveTo(StringBuilder sb,int spaceCount)
+        {
+            sb.AppendLine(new string(' ', spaceCount) + this.ToString());
+            sb.AppendLine(new string(' ', spaceCount) + "{");
+            spaceCount += 4;
+
+            int idx = 0;
+            Expression child = null;
+            if (mChildren.Count > 0)
+            {
+                do
+                {
+                    child = mChildren[idx];
+                    sb.Append(child.ToString());
+                    ++idx;
+                    if (idx < mChildren.Count)
+                        sb.Append(" | ");
+                    else
+                        break;
+                } while (true);
+            }
+
+            sb.Append("}");
+            spaceCount -= 4;
         }
     }
 }

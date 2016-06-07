@@ -93,32 +93,30 @@ namespace CSGrammar
 
         void Loader(Grammar g)
         {
-            var V_B = g.And("V_B");
-            var Var = g.Or("Var");
-            var Var_B = g.And("Var_B");
-            var Vars = g.Or("Vars");
-            var Vars2 = g.And("Vars2");
-            var Varss = g.Or("Varss");
-
-            var OP1 = g.Or("OP1");
             var OP2 = g.Or("OP2");
-            var Var_R = g.And("Var_R");
-            var Var_Com = g.And("Var_Com");
-            var RightExp = g.Or("RightExp");
-            var RightExp1 = g.Or("RightExp1");
-            var RightExp2 = g.And("RightExp2");
-            var LeftExp = g.Or("LeftExp");
-            var Exp1 = g.And("Exp1");
-            var Exp2 = g.And("Exp2");
+            var OP3 = g.Or("OP3");
+            var OP4 = g.Or("OP4");
+            var LHS = g.Or("LHS");
             var Decl = g.And("Decl");
             var Return = g.And("Return");
             var FunBody = g.Or("FunBody");
+
+            var PermissionClass = g.Or("PermissionClass");
+            var PermissionV = g.Or("PermissionV");
+
+            var MemoryFun = g.Or("MemoryFun");
+            var MemoryMember = g.Or("MemoryMember");
+
+            var FunRetType = g.Or("FunRetType");
+            var MemberType = g.Or("MemberType");
+
             var FunArg = g.And("FunArg");
-            var Permission = g.Or("Permission");
-            var Memory = g.Or("Memory");
-            var VType = g.Or("VType");
+
+            var ArgFirst = g.And("ArgFirst");
+            var ArgTrial = g.And("ArgTrial");
             var Argument = g.And("Argument");
             var Arguments = g.Or("Arguments");
+
             var Fun = g.And("Fun");
             var Member1 = g.And("Member1");
             var Member2 = g.And("Member2");
@@ -126,73 +124,76 @@ namespace CSGrammar
             var Class = g.And("Class");
             var Root = g.SectionOr("Root");
 
-            Permission.IsOneOf(TokenID.Permission, Grammar.Empty);
-            Memory.IsOneOf(TokenID.Memory, Grammar.Empty);
-            VType.IsOneOf(TokenID.InnerType, Grammar.ID);
+            PermissionV.IsOneOf(TokenID.Permission, Grammar.Empty);
+            PermissionClass.IsOneOf(TokenID.Permission, Grammar.Empty);
+            
+            MemoryFun.IsOneOf(TokenID.Memory, Grammar.Empty);
+            FunRetType.IsOneOf(TokenID.InnerType, Grammar.ID);
 
-            var ArgFirst = g.And("ArgFirst");
-            var ArgTrial = g.And("ArgTrial");
+            MemoryMember.IsOneOf(TokenID.Memory, Grammar.Empty);
+            MemberType.IsOneOf(TokenID.InnerType, Grammar.ID);
 
-            ArgFirst.Is(Arg.P("ArgType", VType), Arg.P("ArgV", Grammar.ID));
-            ArgTrial.Is(",", Arg.P("ArgType", VType), Arg.P("ArgV", Grammar.ID)).Array();
+            ArgFirst.Is(Arg.P("ArgType", FunRetType), Arg.P("ArgV", Grammar.ID));
+            ArgTrial.Is(",", Arg.P("ArgType", FunRetType), Arg.P("ArgV", Grammar.ID)).Array();
 
             Argument.Is(ArgFirst, ArgTrial);
-
             Arguments.IsOneOf(Grammar.Empty, Argument);
 
+            var Exp1 = g.And("Exp1");
+            var Exp2 = g.And("Exp2");
+
+            var RHS1 = g.Or("RHS1");
+            var RHS = g.Or("RHS");
+
+            var LP = Arg.P("LP", "(");
+            var RP = Arg.P("RP", ")");
+
+            var V = g.And("V").Is(Arg.P("V", Grammar.ID));
             ///function
             {
-                OP1.IsOneOf("+", "-", "*", "/");
+                OP2.IsOneOf(Arg.P("OP", "+="), Arg.P("OP", "-="), Arg.P("OP", "*="), Arg.P("OP", "/="));
+                OP3.IsOneOf(Arg.P("OP3+", "+"), Arg.P("OP3-", "-"), Arg.P("OP4*", "*"), Arg.P("OP4/", "/"));
+                //OP4.IsOneOf(Arg.P("OP4*", "*"), Arg.P("OP4/", "/"));
 
-                OP2.IsOneOf("+=", "-=", "*=", "/=");
+                //RHS1 |= V;
+                //RHS1 |= Arg.And(LP, V, RP);
+                //RHS1 |= Arg.And(V, Arg.And(OP3, RHS1).Array());
+                //RHS1 |= Arg.And(LP, RHS1, RP);
 
-                V_B.Is(Arg.P("(", "("), Grammar.ID, Arg.P(")", ")"));
+                //RHS |= Arg.And(RHS1, Arg.And(OP4, RHS1).Array());
+                //RHS |= Arg.And(LP, RHS, RP);
 
-                Var.IsOneOf(Grammar.ID, Arg.P("V", V_B));
 
-                Var_B.Is(Arg.P("LB", "("), Var, Arg.P("Op", OP1), Var, Arg.P("RB", ")"));
+                RHS |= V;
+                RHS |= Arg.And(LP, V, RP);
+                RHS |= Arg.And(V, Arg.And(OP3, RHS).Array());
+                RHS |= Arg.And(LP, RHS, RP);
 
-                Vars.IsOneOf(Var, Var_B);
+                Decl.Is(Arg.P("T", FunRetType), Arg.P("V", Grammar.ID));
 
-                Vars2.Is(Arg.P("LB", "("), Vars, Arg.P("Op", OP1), Vars, Arg.P("RB", ")"));
+                LHS.IsOneOf(Decl, Arg.P("VL", Grammar.ID));
 
-                Varss.IsOneOf(Vars, Vars2);
+                Exp1.Is(Arg.P("LeftExp", LHS), "=", Arg.P("RExp", RHS), ";");
 
-                Var_R.Is(Arg.P("Op", OP1), Arg.P("V", Varss)).Array();
+                Exp2.Is(Arg.P("LeftExp", Grammar.ID), Arg.P("OP2", OP2), Arg.P("RExp", RHS), ";");
 
-                Var_Com.Is(Arg.P("V", Varss), Arg.P("R", Var_R));
-
-                RightExp1.IsOneOf(Var_Com, Arg.P("V", Grammar.ID));
-
-                RightExp2.Is(Arg.P("(", "("), RightExp1, Arg.P(")", ")"));
-
-                RightExp.IsOneOf(RightExp1, RightExp2);
-
-                Decl.Is(Arg.P("T", VType), Arg.P("V", Grammar.ID));
-
-                LeftExp.IsOneOf(Decl, Arg.P("VL", Grammar.ID));
-
-                Exp1.Is(Arg.P("LeftExp", LeftExp), "=", Arg.P("RightExp", RightExp), ";");
-
-                Exp2.Is(Arg.P("LeftExp", Grammar.ID), Arg.P("OP2", OP2), Arg.P("RightExp", RightExp), ";");
-
-                Return.Is(TokenID.Return, RightExp, ";");
-
-                FunBody.IsOneOf(Exp1, Exp2, Return, Grammar.Empty).Array();
+                Return.Is(TokenID.Return, RHS, ";");
             }
 
-            Fun.Is(Arg.P("Per", Permission)
-                , Arg.P("Memory", Memory)
-                , Arg.P("RET", VType)
+            FunBody.IsOneOf(Exp1, Exp2, Return, Grammar.Empty).Array();
+
+            Fun.Is(Arg.P("Per", PermissionV)
+                , Arg.P("Memory", MemoryFun)
+                , Arg.P("RET", FunRetType)
                 , Arg.P("Name", Grammar.ID)
                 , "(", Arguments, ")"
                 , "{", FunBody, "}");
 
-            Member1.Is(Arg.P("Per", Permission), Memory, Arg.P("Type", VType), Arg.P("Name", Grammar.ID), ";");
+            Member1.Is(Arg.P("Per", PermissionV), MemoryMember, Arg.P("Type", MemberType), Arg.P("Name", Grammar.ID), ";");
 
             ClassBody.IsOneOf(Member1, Fun, Grammar.Empty).Array();
 
-            Class.Is(Permission, TokenID.Class, Arg.P("Name", Grammar.ID), "{", ClassBody, "}");
+            Class.Is(PermissionClass, TokenID.Class, Arg.P("Name", Grammar.ID), "{", ClassBody, "}");
 
             Root.IsOneOf(Class).Array();
         }

@@ -68,25 +68,36 @@ namespace AGrammar
         public Grammar grammar;
         public Count count = Count.One;
 
+        public virtual void SaveTo(StringBuilder sb,int spaceCount)
+        {
+            sb.AppendLine(new string(' ',spaceCount));
+            sb.Append(this.ToString());
+        }
+
         internal Expression()
         {
 
         }
 
-        public virtual Expression Copy()
-        {
-            Expression exp = new Expression();
-            exp.myToken = this.myToken;
-            exp.count = this.count;
-            exp.grammar = this.grammar;
-            return exp;
-        }
+        //public  Expression Copy()
+        //{
+        //    Expression exp = new Expression();
+        //    exp.myToken = this.myToken;
+        //    exp.count = this.count;
+        //    exp.grammar = this.grammar;
+        //    return exp;
+        //}
 
+        protected bool FirstSetted = false;
         internal virtual void SetNext()
         {
+            if (FirstSetted)
+                return;
+
             if (parent && !next)
                 this.next = parent.GetNextSubling(this);
         }
+
         internal virtual bool FastMatch(int start, ref int offset)
         {
             int idx = start + offset;

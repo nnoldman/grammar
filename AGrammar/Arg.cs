@@ -47,13 +47,28 @@ namespace AGrammar
             arg.exp = content;
             return arg;
         }
-
+        public static ArgAnd And(params object[] args)
+        {
+            ArgAnd arg = new ArgAnd();
+            arg.args = args;
+            return arg;
+        }
         public class ArgProp : Arg
         {
             public string propName;
             public object exp;
             internal ArgProp()
             {
+            }
+        }
+        public class ArgAnd : Arg
+        {
+            public object[] args;
+            public bool array = false;
+            public ArgAnd Array()
+            {
+                array = true;
+                return this;
             }
         }
     }
