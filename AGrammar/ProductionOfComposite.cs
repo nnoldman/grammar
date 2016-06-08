@@ -8,10 +8,6 @@ namespace AGrammar
 {
     public class ProductionOfComposite : Production
     {
-        public ProductionOfComposite()
-        {
-        }
-
         public string name;
 
         public List<Production> children = new List<Production>();

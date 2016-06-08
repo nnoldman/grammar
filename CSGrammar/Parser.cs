@@ -104,6 +104,7 @@ namespace CSGrammar
             Production Permission = Factory.Or("Permission").Node();
             Production Expressions = Factory.Or("Expressions").Array();
             Production OP2 = Factory.Or("OP2").Node();
+            Production OP3 = Factory.Or("OP3").Node();
             Production V = Factory.Or("V").Node();
             Production Exp = Factory.And("Exp");
             Production ExpDecl = Factory.And("ExpDecl");
@@ -128,7 +129,8 @@ namespace CSGrammar
             Production OpDiv = Factory.Symbol("/").Node("Op");
             Production VTypeID = Factory.Symbol(Grammar.ID).Node("Type");
 
-            OP2.Add(OpAdd | OpSub | OpMul | OpDiv);
+            OP2.Add(OpAdd | OpSub );
+            OP3.Add(OpMul | OpDiv);
 
             V.Add(Var);
             V.Add("(" + V + ")");
@@ -137,13 +139,14 @@ namespace CSGrammar
             LHS.Add(Var | Decl);
 
             Factor.Add(V);
-            Factor.Add(V + OP2 + V);
+            Factor.Add(V + OP3 + Factor);
             Factor.Add("(" + Factor + ")");
 
             RHS.Add(V);
-            RHS.Add("(" + RHS + ")");
-            RHS.Add(V + OP2 + V);
+            RHS.Add(V + OP2 + Factor);
+            RHS.Add(V + OP2 + RHS);
             RHS.Add(Factor + OP2 + RHS);
+            RHS.Add("(" + RHS + ")");
 
             Exp.Add(LHS + "=" + RHS + ";");
 
@@ -170,11 +173,12 @@ namespace CSGrammar
             ClassBody.Add(Member | Func | Grammar.Empty);
 
             Class.Add(Permission + Memory + TokenID.Class + "{" + ClassName + ClassBody + "}");
-
+            
             Root.Add(Class);
 
             return Root;
         }
+
         public GrammarTree Load(Action<string> messageHandler, string content)
         {
             Production root = Loader();
