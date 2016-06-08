@@ -39,18 +39,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Arg.cs" />
-    <Compile Include="AndExpression.cs" />
+    <Compile Include="ProductionOfAnd.cs" />
     <Compile Include="BoolObject.cs" />
+    <Compile Include="ProductionOfComposite.cs" />
+    <Compile Include="ProductionOfEmpty.cs" />
     <Compile Include="GrammarTree.cs" />
-    <Compile Include="EmptyExpression.cs" />
-    <Compile Include="PropExpression.cs" />
-    <Compile Include="OrExpression.cs" />
-    <Compile Include="CompositeExpression.cs" />
+    <Compile Include="ProductionOfInt.cs" />
+    <Compile Include="Factory.cs" />
     <Compile Include="Grammar.cs" />
+    <Compile Include="PruductionOfOr.cs" />
+    <Compile Include="Production.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scanner.cs" />
-    <Compile Include="Expression.cs" />
+    <Compile Include="ProductionOfString.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
