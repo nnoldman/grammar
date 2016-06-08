@@ -32,6 +32,11 @@ namespace AGrammar
     {
         public List<GrammarTreeNode> propertices = new List<GrammarTreeNode>();
 
+        public void Clear()
+        {
+            propertices.Clear();
+        }
+
         string Space(int tabcount)
         {
             return new string(' ', tabcount);

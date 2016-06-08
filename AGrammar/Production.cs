@@ -7,14 +7,11 @@ using System.Threading.Tasks;
 
 namespace AGrammar
 {
-    public class Node : BoolObject
-    {
-        public string name = string.Empty;
-    }
     public class Production : BoolObject
     {
         protected bool barray = false;
-        protected Node node;
+        internal Node node;
+        protected ProductionOfOr followSet;
 
         public Production Array()
         {
@@ -44,48 +41,19 @@ namespace AGrammar
             throw new Exception();
         }
 
-        protected virtual PruductionOfOr GetOr()
-        {
-            throw new Exception();
-        }
-
-        protected virtual ProductionOfAnd GetAnd()
-        {
-            throw new Exception();
-        }
-
         public virtual void Add(Production rhs)
         {
-            if (GetOr())
-            {
-                if (rhs.GetOr())
-                    GetOr().children.AddRange(rhs.GetOr().children);
-                else
-                    GetOr().children.Add(rhs);
-            }
-            else if (GetAnd())
-            {
-                if (rhs.GetAnd())
-                    GetAnd().children.AddRange(rhs.GetAnd().children);
-                else
-                    GetAnd().children.Add(rhs);
-            }
-            else
-            {
-                throw new Exception();
-            }
-        }
-
-        internal virtual int Match(List<Token> tokens, int s, GrammarTree parentTree)
-        {
             throw new Exception();
         }
 
-
+        internal virtual bool Match(List<Token> tokens, ref int n, GrammarTree parentTree)
+        {
+            throw new Exception();
+        }
 
         public static Production operator |(string content, Production rhs)
         {
-            PruductionOfOr parent = new PruductionOfOr();
+            ProductionOfOr parent = new ProductionOfOr();
             parent.Add(new ProductionOfString() { content = content });
             parent.Add(rhs);
             return parent;
@@ -101,7 +69,7 @@ namespace AGrammar
 
         public static Production operator |(int tokenID, Production rhs)
         {
-            PruductionOfOr parent = new PruductionOfOr();
+            ProductionOfOr parent = new ProductionOfOr();
             parent.Add(new ProductionOfInt() { tokenid = tokenID });
             parent.Add(rhs);
             return parent;
@@ -109,7 +77,7 @@ namespace AGrammar
 
         public static Production operator |(Production lhs, int tokenID)
         {
-            PruductionOfOr parent = new PruductionOfOr();
+            ProductionOfOr parent = new ProductionOfOr();
             parent.Add(lhs);
             parent.Add(new ProductionOfInt() { tokenid = tokenID });
             return parent;
@@ -117,7 +85,7 @@ namespace AGrammar
 
         public static Production operator |(Production lhs, string content)
         {
-            PruductionOfOr parent = new PruductionOfOr();
+            ProductionOfOr parent = new ProductionOfOr();
             parent.Add(lhs);
             parent.Add(new ProductionOfString() { content = content });
             return parent;
@@ -125,7 +93,7 @@ namespace AGrammar
         
         public static Production operator |(Production lhs, Production rhs)
         {
-            PruductionOfOr parent = new PruductionOfOr();
+            ProductionOfOr parent = new ProductionOfOr();
             parent.Add(lhs);
             parent.Add(rhs);
             return parent;

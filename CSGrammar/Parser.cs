@@ -95,13 +95,13 @@ namespace CSGrammar
         Production Loader()
         {
             Production Root = Factory.Or("CSGrammar");
-            Production Class = Factory.And("Class").Array();
-            Production ClassBody = Factory.Or("Class_Body").Array();
-            Production Member = Factory.And("Member");
-            Production Func = Factory.And("Func");
+            Production Class = Factory.And("Class").Array().Node("Class");
+            Production ClassBody = Factory.Or("Class_Body").Node("ClassBody");
+            Production Member = Factory.And("Member").Node("ClassMember");
+            Production Func = Factory.And("Func").Node("ClassFunc");
             Production VType = Factory.Or("Type").Node();
             Production Memory = Factory.Or("Memory").Node();
-            Production Permission = Factory.Or("Permission").Node();
+            Production Permission = Factory.Or("Permission").Node("Permission");
             Production Expressions = Factory.Or("Expressions").Array();
             Production OP2 = Factory.Or("OP2").Node();
             Production OP3 = Factory.Or("OP3").Node();
@@ -128,6 +128,8 @@ namespace CSGrammar
             Production OpMul = Factory.Symbol("*").Node("Op");
             Production OpDiv = Factory.Symbol("/").Node("Op");
             Production VTypeID = Factory.Symbol(Grammar.ID).Node("Type");
+
+            Production EOF = Factory.Symbol(Grammar.EOFToken);
 
             OP2.Add(OpAdd | OpSub );
             OP3.Add(OpMul | OpDiv);
@@ -173,8 +175,8 @@ namespace CSGrammar
             ClassBody.Add(Member | Func | Grammar.Empty);
 
             Class.Add(Permission + Memory + TokenID.Class + "{" + ClassName + ClassBody + "}");
-            
-            Root.Add(Class);
+
+            Root.Add(Class | EOF);
 
             return Root;
         }

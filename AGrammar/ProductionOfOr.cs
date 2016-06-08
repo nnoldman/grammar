@@ -6,18 +6,8 @@ using System.Threading.Tasks;
 
 namespace AGrammar
 {
-    public class PruductionOfOr : ProductionOfComposite
+    public class ProductionOfOr : ProductionOfComposite
     {
-        protected override PruductionOfOr GetOr()
-        {
-            return this;
-        }
-
-        protected override ProductionOfAnd GetAnd()
-        {
-            return null;
-        }
-
         public override string ToString()
         {
             //string d = name + ':';
@@ -39,10 +29,35 @@ namespace AGrammar
 
         public override Production Copy()
         {
-            PruductionOfOr production = new PruductionOfOr();
+            ProductionOfOr production = new ProductionOfOr();
             production.name = this.name;
             this.CopyChildrenTo(production);
             return production;
+        }
+
+     
+
+        public override void Add(Production rhs)
+        {
+            ProductionOfOr or = rhs as ProductionOfOr;
+            if (or)
+                children.AddRange(or.children);
+            else
+                children.Add(rhs);
+        }
+
+        internal override bool Match(List<Token> tokens, ref int n, GrammarTree parentTree)
+        {
+            foreach (var child in children)
+            {
+                int offset = n;
+                if (!child.Match(tokens, ref offset, parentTree))
+                {
+                    n = offset;
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

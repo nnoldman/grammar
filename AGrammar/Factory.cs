@@ -28,7 +28,7 @@ namespace AGrammar
         }
         public static Production Or(string name)
         {
-            PruductionOfOr production = new PruductionOfOr();
+            ProductionOfOr production = new ProductionOfOr();
             production.name = name;
             return production;
         }

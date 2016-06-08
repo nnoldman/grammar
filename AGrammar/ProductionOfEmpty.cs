@@ -12,20 +12,14 @@ namespace AGrammar
         {
             return new ProductionOfEmpty();
         }
-
-        protected override PruductionOfOr GetOr()
-        {
-            return null;
-        }
-
-        protected override ProductionOfAnd GetAnd()
-        {
-            return null;
-        }
-
         public override string ToString()
         {
             return "Empty";
+        }
+
+        internal override bool Match(List<Token> tokens, ref int n, GrammarTree parentTree)
+        {
+            return true;
         }
     }
 }

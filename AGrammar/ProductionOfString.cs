@@ -22,14 +22,19 @@ namespace AGrammar
             return production;
         }
 
-        protected override PruductionOfOr GetOr()
+        internal override bool Match(List<Token> tokens, ref int n, GrammarTree parentTree)
         {
-            return null;
-        }
-
-        protected override ProductionOfAnd GetAnd()
-        {
-            return null;
+            if (tokens[n] is EOFToken)
+                return true;
+            if (tokens[n].Word == content)
+            {
+                n++;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

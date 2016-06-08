@@ -14,6 +14,8 @@ namespace AGrammar
     public class Grammar
     {
         public const int ID = 0;
+
+        public const string EOFToken = "EOF";
         public static int InvalidTokenType = -1;
 
         Action<string> mMessageHandler;
@@ -175,14 +177,12 @@ namespace AGrammar
         {
             GrammarTree tree = new GrammarTree();
             tree.propName = p.ToString();
+            int offset = 0;
 
-            if (p.Match(mTokens, 0, tree) == mTokens.Count)
-            {
+            if (p.Match(mTokens, ref offset, tree))
                 mTree = tree;
-                return tree;
-            }
 
-            return null;
+            return mTree;
         }
         
         void LoadExpressions(Action<Grammar> loader)

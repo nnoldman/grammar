@@ -41,7 +41,13 @@ namespace AGrammar
             return string.Format("Error=>Line:{0},Col:{1},Content:{2}", Line, Column, Word);
         }
     }
-
+    internal class EOFToken : Token
+    {
+        internal EOFToken()
+        {
+            Word = Grammar.EOFToken;
+        }
+    }
     internal class Scanner
     {
         enum CommentState
@@ -245,6 +251,10 @@ namespace AGrammar
                     col = 1;
                     line++;
                 }
+            }
+            if (tokens.Count > 0)
+            {
+                tokens.Add(new EOFToken());
             }
             return tokens;
         }
