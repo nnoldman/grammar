@@ -50,11 +50,11 @@ namespace AGrammar
     }
     internal class Scanner
     {
-        enum CommentState
+        enum State
         {
             None,
-            Line,
-            Block,
+            LineCommenting,
+            BlockCommenting,
         }
 
         public Action<string> ErrorHandler;
@@ -68,6 +68,10 @@ namespace AGrammar
             };
 
         Dictionary<string, KeyWord> mKeyWords = new Dictionary<string, KeyWord>();
+
+        char mCurrent;
+        int mPosition;
+        string mContent;
 
         public string[] Termins
         {
@@ -117,16 +121,16 @@ namespace AGrammar
             return true;
         }
 
-        bool Check(string content, int idx, string target)
+        bool CurrentIs(string target)
         {
             if (target == null)
                 return false;
             
             if (target.Length == 1)
-                return idx < content.Length && content[idx] == target[0];
+                return mPosition < mContent.Length && mContent[mPosition] == target[0];
 
             if (target.Length == 2)
-                return idx + 1 < content.Length && content[idx] == target[0] && content[idx + 1] == target[1];
+                return mPosition + 1 < mContent.Length && mContent[mPosition] == target[0] && mContent[mPosition + 1] == target[1];
 
             throw new Exception();
         }
@@ -149,13 +153,13 @@ namespace AGrammar
             t.Column = col;
             tokens.Add(t);
         }
-        bool MatchTerminations(ref string content, List<Token> tokens,int i, StringBuilder sb, int line, int col,out string terimnal)
+        bool MatchTerminations(List<Token> tokens, StringBuilder sb, int line, int col, out string terimnal)
         {
             for (int j = 0; j < mTermins.Length; ++j)
             {
                 string ter = mTermins[j];
 
-                if (Check(content, i, ter))
+                if (CurrentIs(ter))
                 {
                     Terminate(sb, line, col, tokens);
                     AddTerminate(ter, line, col, tokens);
@@ -166,47 +170,45 @@ namespace AGrammar
             terimnal = null;
             return false;
         }
-        public List<Token> Scan(KeyWord[] tokenParams, string content)
+
+        bool ReadChar()
         {
-            if (!Init(tokenParams))
-                return null;
-
-            Debug.Assert(mTermins != null);
-
-            content = content.Replace("\r\n", "\n");
-
+            if (mPosition + 1 == mContent.Length)
+                return false;
+            mCurrent = mContent[++mPosition];
+            return true;
+        }
+        List<Token> Parse()
+        {
             List<Token> tokens = new List<Token>();
             int line = 1;
-            int len = content.Length;
             int col = 1;
 
-            CommentState commenting = CommentState.None;
+            State commenting = State.None;
 
             StringBuilder sb = new StringBuilder();
 
-            for (int i = 0; i < len; )
+            while (ReadChar())
             {
-                char ch = content[i];
-
                 int offset = 1;
 
                 switch (commenting)
                 {
-                    case CommentState.None:
+                    case State.None:
                         {
-                            if (Check(content, i, LineComment))
+                            if (CurrentIs(LineComment))
                             {
                                 Terminate(sb, line, col, tokens);
-                                commenting = CommentState.Line;
+                                commenting = State.LineCommenting;
                             }
-                            else if (Check(content, i, BlockCommentStart))
+                            else if (CurrentIs(BlockCommentStart))
                             {
                                 Terminate(sb, line, col, tokens);
-                                commenting = CommentState.Block;
+                                commenting = State.BlockCommenting;
                             }
                             else
                             {
-                                if (ch == '\n' || ch == '\t' || ch == ' ')
+                                if (mCurrent == '\n' || mCurrent == '\t' || mCurrent == ' ')
                                 {
                                     Terminate(sb, line, col, tokens);
                                 }
@@ -214,29 +216,29 @@ namespace AGrammar
                                 {
                                     string ter;
 
-                                    if (MatchTerminations(ref content, tokens, i, sb, line, col, out ter))
+                                    if (MatchTerminations(tokens, sb, line, col, out ter))
                                     {
                                         offset = ter.Length;
                                     }
                                     else
                                     {
-                                        sb.Append(ch);
+                                        sb.Append(mCurrent);
                                     }
                                 }
                             }
                         }
                         break;
-                    case CommentState.Line:
+                    case State.LineCommenting:
                         {
-                            if (ch == '\n')
-                                commenting = CommentState.None;
+                            if (mCurrent == '\n')
+                                commenting = State.None;
                         }
                         break;
-                    case CommentState.Block:
+                    case State.BlockCommenting:
                         {
-                            if (Check(content, i, BlockCommentEnd))
+                            if (CurrentIs(BlockCommentEnd))
                             {
-                                commenting = CommentState.None;
+                                commenting = State.None;
                                 offset = BlockCommentEnd.Length;
                             }
                         }
@@ -244,19 +246,25 @@ namespace AGrammar
                 }
 
                 col += offset;
-                i += offset;
 
-                if (ch == '\n')
+                if (mCurrent == '\n')
                 {
                     col = 1;
                     line++;
                 }
             }
             if (tokens.Count > 0)
-            {
                 tokens.Add(new EOFToken());
-            }
             return tokens;
+        }
+        public List<Token> Scan(KeyWord[] tokenParams, string content)
+        {
+            if (!Init(tokenParams))
+                return null;
+            Debug.Assert(mTermins != null);
+            mContent = content.Replace("\r\n", "\n"); ;
+            mPosition = 0;
+            return Parse();
         }
 
         private int GetTokenType(string lex)
