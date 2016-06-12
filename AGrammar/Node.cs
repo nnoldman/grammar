@@ -6,25 +6,13 @@ using System.Threading.Tasks;
 
 namespace AGrammar
 {
-    internal class Node : BoolObject
+    internal class Node
     {
-        public string name = string.Empty;
+        public int line;
 
-        internal void AddContent(GrammarTree tree)
+        public void Error(string text)
         {
-            if (!string.IsNullOrEmpty(name))
-            {
-                GrammarTreeNode node = new GrammarTreeNode();
-                node.propName = name;
-                tree.propertices.Add(node);
-            }
-        }
-        internal void AddContent(GrammarTree tree, List<Token> tokens, int n)
-        {
-            PropertyTreeNode node = new PropertyTreeNode();
-            node.propName = name;
-            node.content = tokens[n].Word;
-            tree.propertices.Add(node);
+            throw new Exception(string.Format("Error({0})=>{1}", line, text));
         }
     }
 }

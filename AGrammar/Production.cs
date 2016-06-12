@@ -10,7 +10,7 @@ namespace AGrammar
     public class Production : BoolObject
     {
         protected bool barray = false;
-        internal Node node;
+        internal Node2 node;
         protected ProductionOfOr followSet;
 
         public Production Array()
@@ -22,7 +22,7 @@ namespace AGrammar
         public Production Node()
         {
             if (!node)
-                node = new Node();
+                node = new Node2();
             return this;
         }
 
@@ -30,7 +30,7 @@ namespace AGrammar
         {
             if (!node)
             {
-                node = new Node();
+                node = new Node2();
                 node.name = name;
             }
             return this;
@@ -46,7 +46,7 @@ namespace AGrammar
             throw new Exception();
         }
 
-        internal virtual bool Match(List<Token> tokens, ref int n, GrammarTree parentTree)
+        internal virtual bool Match(List<Token2> tokens, ref int n, GrammarTree parentTree)
         {
             throw new Exception();
         }

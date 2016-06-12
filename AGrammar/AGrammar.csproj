@@ -39,7 +39,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AType.cs" />
+    <Compile Include="Env.cs" />
+    <Compile Include="Expr.cs" />
+    <Compile Include="ID.cs" />
     <Compile Include="Node.cs" />
+    <Compile Include="Op.cs" />
+    <Compile Include="Token.cs" />
+    <Compile Include="Node2.cs" />
     <Compile Include="ProductionOfAnd.cs" />
     <Compile Include="BoolObject.cs" />
     <Compile Include="ProductionOfComposite.cs" />

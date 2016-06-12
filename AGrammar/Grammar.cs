@@ -9,7 +9,7 @@ namespace AGrammar
 {
     internal class FrameError
     {
-        internal List<Token> errors = new List<Token>();
+        internal List<Token2> errors = new List<Token2>();
     }
     public class Grammar
     {
@@ -22,10 +22,10 @@ namespace AGrammar
         KeyWord[] mExternTokens;
 
         Scanner mScanner;
-        List<Token> mTokens;
+        List<Token2> mTokens;
         GrammarTree mTree = new GrammarTree();
 
-        Dictionary<int, List<Token>> mErrorStack = new Dictionary<int, List<Token>>();
+        Dictionary<int, List<Token2>> mErrorStack = new Dictionary<int, List<Token2>>();
 
         public static Production Empty
         {
@@ -37,7 +37,7 @@ namespace AGrammar
         public Grammar()
         {
             mScanner = new Scanner();
-            mTokens = new List<Token>();
+            mTokens = new List<Token2>();
         }
         public string[] Termins
         {
@@ -57,7 +57,7 @@ namespace AGrammar
                 return mTree;
             }
         }
-        internal List<Token> Tokens
+        internal List<Token2> Tokens
         {
             get
             {
@@ -72,14 +72,14 @@ namespace AGrammar
 
         static int mErrorID;
 
-        internal void PushError(int errid, Token token)
+        internal void PushError(int errid, Token2 token)
         {
             mErrorStack[errid].Add(token);
         }
         internal int RequireErrorID()
         {
             mErrorID++;
-            mErrorStack.Add(mErrorID, new List<Token>());
+            mErrorStack.Add(mErrorID, new List<Token2>());
             return mErrorID;
         }
         internal void PopError(int errorID)
@@ -94,7 +94,7 @@ namespace AGrammar
                 mErrorStack.Remove(i);
             mErrorStack.Remove(errorID);
         }
-        void Error(Token token)
+        void Error(Token2 token)
         {
             Error(string.Format("Load Error:{0}", token.ToString()));
         }
@@ -154,7 +154,7 @@ namespace AGrammar
             if (mErrorStack.Count == 0)
                 return;
 
-            List<Token> errors = new List<Token>();
+            List<Token2> errors = new List<Token2>();
             foreach (var i in mErrorStack)
             {
                 errors.AddRange(i.Value);
@@ -163,7 +163,7 @@ namespace AGrammar
             Error(errors[0].Error());
         }
 
-        int SortError(Token a, Token b)
+        int SortError(Token2 a, Token2 b)
         {
             if (a.Line == b.Line && a.Column == b.Column)
                 return 0;

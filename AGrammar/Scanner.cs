@@ -15,17 +15,17 @@ namespace AGrammar
             return string.Format("<{0}>{1}", WordType, Word);
         }
     }
-    internal class Token
+    internal class Token2
     {
         public int WordType;
         public string Word;
         public int Line;
         public int Column;
 
-        public Token()
+        public Token2()
         {
         }
-        public Token(int tt, string content, int line, int indexOnLine)
+        public Token2(int tt, string content, int line, int indexOnLine)
         {
             this.WordType = tt;
             this.Word = content;
@@ -41,7 +41,7 @@ namespace AGrammar
             return string.Format("Error=>Line:{0},Col:{1},Content:{2}", Line, Column, Word);
         }
     }
-    internal class EOFToken : Token
+    internal class EOFToken : Token2
     {
         internal EOFToken()
         {
@@ -135,25 +135,25 @@ namespace AGrammar
             throw new Exception();
         }
 
-        void Terminate(StringBuilder sb,int line,int col,List<Token> tokens)
+        void Terminate(StringBuilder sb,int line,int col,List<Token2> tokens)
         {
             if (sb.Length == 0)
                 return;
             int tp = GetTokenType(sb.ToString());
-            Token t = new Token(tp, sb.ToString(), line, col - sb.Length);
+            Token2 t = new Token2(tp, sb.ToString(), line, col - sb.Length);
             tokens.Add(t);
             sb.Clear();
         }
-        void AddTerminate(string ter, int line, int col, List<Token> tokens)
+        void AddTerminate(string ter, int line, int col, List<Token2> tokens)
         {
-            Token t = new Token();
+            Token2 t = new Token2();
             t.WordType = GetTokenType(ter);
             t.Word = ter;
             t.Line = line;
             t.Column = col;
             tokens.Add(t);
         }
-        bool MatchTerminations(List<Token> tokens, StringBuilder sb, int line, int col, out string terimnal)
+        bool MatchTerminations(List<Token2> tokens, StringBuilder sb, int line, int col, out string terimnal)
         {
             for (int j = 0; j < mTermins.Length; ++j)
             {
@@ -178,9 +178,9 @@ namespace AGrammar
             mCurrent = mContent[++mPosition];
             return true;
         }
-        List<Token> Parse()
+        List<Token2> Parse()
         {
-            List<Token> tokens = new List<Token>();
+            List<Token2> tokens = new List<Token2>();
             int line = 1;
             int col = 1;
 
@@ -257,7 +257,7 @@ namespace AGrammar
                 tokens.Add(new EOFToken());
             return tokens;
         }
-        public List<Token> Scan(KeyWord[] tokenParams, string content)
+        public List<Token2> Scan(KeyWord[] tokenParams, string content)
         {
             if (!Init(tokenParams))
                 return null;
