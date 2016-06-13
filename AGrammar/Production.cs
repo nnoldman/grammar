@@ -46,7 +46,7 @@ namespace AGrammar
             throw new Exception();
         }
 
-        internal virtual bool Match(List<Token2> tokens, ref int n, GrammarTree parentTree)
+        internal virtual bool Match(List<Token> tokens, ref int n, GrammarTree parentTree)
         {
             throw new Exception();
         }

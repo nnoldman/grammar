@@ -22,17 +22,19 @@ namespace AGrammar
             return production;
         }
 
-        internal override bool Match(List<Token2> tokens, ref int n, GrammarTree parentTree)
+        internal override bool Match(List<Token> tokens, ref int n, GrammarTree parentTree)
         {
-            if (tokens[n].WordType == tokenid)
-            {
-                n++;
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            throw new Exception();
+
+            //if (tokens[n].Tag == tokenid)
+            //{
+            //    n++;
+            //    return true;
+            //}
+            //else
+            //{
+            //    return false;
+            //}
         }
     }
 }

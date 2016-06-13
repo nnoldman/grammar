@@ -1,53 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
+
 namespace AGrammar
 {
-    public class KeyWord
-    {
-        public int WordType;
-        public string Word;
-
-        public override string ToString()
-        {
-            return string.Format("<{0}>{1}", WordType, Word);
-        }
-    }
-    internal class Token2
-    {
-        public int WordType;
-        public string Word;
-        public int Line;
-        public int Column;
-
-        public Token2()
-        {
-        }
-        public Token2(int tt, string content, int line, int indexOnLine)
-        {
-            this.WordType = tt;
-            this.Word = content;
-            this.Line = line;
-            this.Column = indexOnLine;
-        }
-        public override string ToString()
-        {
-            return string.Format("{0} [{1}]", WordType, Word);
-        }
-        public string Error()
-        {
-            return string.Format("Error=>Line:{0},Col:{1},Content:{2}", Line, Column, Word);
-        }
-    }
-    internal class EOFToken : Token2
-    {
-        internal EOFToken()
-        {
-            Word = Grammar.EOFToken;
-        }
-    }
     internal class Scanner
     {
         enum State
@@ -55,77 +13,30 @@ namespace AGrammar
             None,
             LineCommenting,
             BlockCommenting,
+            Scanning,
         }
 
-        public Action<string> ErrorHandler;
+        protected string mContent;
+        protected int mPosition = -1;
+        protected char mPeek;
 
-        public string LineComment = "//";
-        public string BlockCommentStart = "/*";
-        public string BlockCommentEnd = "*/";
-        string[] mTermins = new string[]{
-            "+=", "-=", "*=", "/=","<=", "==","!=", ">=", "||", "&&", "++", "--",
-            "+", "-", "*", "/", ".", "=", "?", "(", ")", "{", "}", "[", "]","<",">" ,":", ";", ",", "|", "&",
-            };
+        protected Grammar mGrammar;
 
-        Dictionary<string, KeyWord> mKeyWords = new Dictionary<string, KeyWord>();
-
-        char mCurrent;
-        int mPosition;
-        string mContent;
-
-        public string[] Termins
+        protected bool ReadChar()
         {
-            get
+            if (mPosition + 1 < mContent.Length)
             {
-                return mTermins;
+                mPosition++;
+                mPeek = mContent[mPosition];
+                return true;
             }
-            set
-            {
-                List<string> rawList = new List<string>();
-                rawList.AddRange(value);
-                rawList.Sort(SortFunc);
-                mTermins = rawList.ToArray();
-            }
+            return false;
         }
-
-
-        static int SortFunc(string a, string b)
-        {
-            int la = a.Length;
-            int lb = b.Length;
-            if (la == lb)
-                return 0;
-            if (la > lb)
-                return -1;
-            return 1;
-        }
-
-        void Error(string msg)
-        {
-            if (ErrorHandler != null)
-                ErrorHandler(msg);
-        }
-        public bool Init(KeyWord[] tokens)
-        {
-            mKeyWords.Clear();
-
-            foreach (var item in tokens)
-            {
-                if (item.WordType == Grammar.ID)
-                {
-                    Error("ID 0 is reserver for global id.");
-                    return false;
-                }
-                mKeyWords.Add(item.Word, item);
-            }
-            return true;
-        }
-
         bool CurrentIs(string target)
         {
             if (target == null)
                 return false;
-            
+
             if (target.Length == 1)
                 return mPosition < mContent.Length && mContent[mPosition] == target[0];
 
@@ -135,56 +46,72 @@ namespace AGrammar
             throw new Exception();
         }
 
-        void Terminate(StringBuilder sb,int line,int col,List<Token2> tokens)
+        void AddKeyWordOrID(StringBuilder sb, int line, int col, List<Token> tokens)
         {
             if (sb.Length == 0)
                 return;
+
             int tp = GetTokenType(sb.ToString());
-            Token2 t = new Token2(tp, sb.ToString(), line, col - sb.Length);
+
+            Token t = null;
+
+            if (tp == Grammar.ID)
+            {
+                t = new IDToken() { Word = sb.ToString(), Line = line, Column = col - sb.Length };
+            }
+            else
+            {
+                t = new KeyWordToken() { Tag = tp, Word = sb.ToString(), Line = line, Column = col - sb.Length };
+            }
             tokens.Add(t);
             sb.Clear();
         }
-        void AddTerminate(string ter, int line, int col, List<Token2> tokens)
+        void AddTerminate(string ter, int line, int col, List<Token> tokens)
         {
-            Token2 t = new Token2();
-            t.WordType = GetTokenType(ter);
+            TerminalToken t = new TerminalToken();
             t.Word = ter;
             t.Line = line;
             t.Column = col;
             tokens.Add(t);
         }
-        bool MatchTerminations(List<Token2> tokens, StringBuilder sb, int line, int col, out string terimnal)
+        bool AddNumber(int line, int col, List<Token> tokens)
         {
-            for (int j = 0; j < mTermins.Length; ++j)
+            NumberToken number = Number.Parse(mContent, mPosition);
+            if (number)
             {
-                string ter = mTermins[j];
+                number.Line = line;
+                number.Column = col;
+                tokens.Add(number);
+                return true;
+            }
+            return false;
+        }
+        bool MatchTerminations(List<Token> tokens, StringBuilder sb, int line, int col)
+        {
+            for (int j = 0; j < mGrammar.config.scanner.terminals.Length; ++j)
+            {
+                string ter = mGrammar.config.scanner.terminals[j];
 
                 if (CurrentIs(ter))
                 {
-                    Terminate(sb, line, col, tokens);
+                    AddKeyWordOrID(sb, line, col, tokens);
                     AddTerminate(ter, line, col, tokens);
-                    terimnal = ter;
                     return true;
                 }
             }
-            terimnal = null;
             return false;
         }
+        internal List<Token> Scan(Grammar grammar, string content)
+        {
+            mContent = content.Replace("\r\n", "\n");
+            mGrammar = grammar;
 
-        bool ReadChar()
-        {
-            if (mPosition + 1 == mContent.Length)
-                return false;
-            mCurrent = mContent[++mPosition];
-            return true;
-        }
-        List<Token2> Parse()
-        {
-            List<Token2> tokens = new List<Token2>();
+            List<Token> tokens = new List<Token>();
+
             int line = 1;
             int col = 1;
 
-            State commenting = State.None;
+            State stat = State.None;
 
             StringBuilder sb = new StringBuilder();
 
@@ -192,62 +119,67 @@ namespace AGrammar
             {
                 int offset = 1;
 
-                switch (commenting)
+                if (stat == State.None || stat == State.Scanning)
                 {
-                    case State.None:
-                        {
-                            if (CurrentIs(LineComment))
-                            {
-                                Terminate(sb, line, col, tokens);
-                                commenting = State.LineCommenting;
-                            }
-                            else if (CurrentIs(BlockCommentStart))
-                            {
-                                Terminate(sb, line, col, tokens);
-                                commenting = State.BlockCommenting;
-                            }
-                            else
-                            {
-                                if (mCurrent == '\n' || mCurrent == '\t' || mCurrent == ' ')
-                                {
-                                    Terminate(sb, line, col, tokens);
-                                }
-                                else
-                                {
-                                    string ter;
-
-                                    if (MatchTerminations(tokens, sb, line, col, out ter))
-                                    {
-                                        offset = ter.Length;
-                                    }
-                                    else
-                                    {
-                                        sb.Append(mCurrent);
-                                    }
-                                }
-                            }
-                        }
-                        break;
-                    case State.LineCommenting:
-                        {
-                            if (mCurrent == '\n')
-                                commenting = State.None;
-                        }
-                        break;
-                    case State.BlockCommenting:
-                        {
-                            if (CurrentIs(BlockCommentEnd))
-                            {
-                                commenting = State.None;
-                                offset = BlockCommentEnd.Length;
-                            }
-                        }
-                        break;
+                    if (CurrentIs(mGrammar.config.scanner.lineComment))
+                    {
+                        AddKeyWordOrID(sb, line, col, tokens);
+                        stat = State.LineCommenting;
+                    }
+                    else if (CurrentIs(mGrammar.config.scanner.blockCommentStart))
+                    {
+                        AddKeyWordOrID(sb, line, col, tokens);
+                        stat = State.BlockCommenting;
+                    }
+                    else if (MatchTerminations(tokens, sb, line, col))
+                    {
+                        offset = tokens[tokens.Count - 1].Word.Length;
+                        stat = State.None;
+                    }
+                    else if (mPeek == '\n' || mPeek == '\t' || mPeek == ' ')
+                    {
+                        AddKeyWordOrID(sb, line, col, tokens);
+                        stat = State.None;
+                    }
+                    else if (stat == State.None && Helper.IsDigital(mPeek))
+                    {
+                        if (AddNumber(line, col, tokens))
+                            offset = tokens[tokens.Count - 1].Word.Length;
+                        else
+                            return null;
+                    }
+                    else if (stat == State.None && Helper.IsLetter(mPeek))
+                    {
+                        stat = State.Scanning;
+                        sb.Append(mPeek);
+                    }
+                    else if (stat == State.Scanning)
+                    {
+                        sb.Append(mPeek);
+                    }
+                    else
+                    {
+                        throw new Exception();
+                    }
+                }
+                else if (stat == State.LineCommenting)
+                {
+                    if (mPeek == '\n')
+                        stat = State.None;
+                }
+                else if (stat == State.BlockCommenting)
+                {
+                    if (CurrentIs(mGrammar.config.scanner.blockCommentEnd))
+                    {
+                        stat = State.None;
+                        offset = mGrammar.config.scanner.blockCommentEnd.Length;
+                    }
                 }
 
                 col += offset;
+                mPosition += offset - 1;
 
-                if (mCurrent == '\n')
+                if (mPeek == '\n')
                 {
                     col = 1;
                     line++;
@@ -255,25 +187,12 @@ namespace AGrammar
             }
             if (tokens.Count > 0)
                 tokens.Add(new EOFToken());
+
             return tokens;
         }
-        public List<Token2> Scan(KeyWord[] tokenParams, string content)
-        {
-            if (!Init(tokenParams))
-                return null;
-            Debug.Assert(mTermins != null);
-            mContent = content.Replace("\r\n", "\n"); ;
-            mPosition = 0;
-            return Parse();
-        }
-
         private int GetTokenType(string lex)
         {
-            if (mTermins.Contains(lex))
-                return Grammar.InvalidTokenType;
-            KeyWord word = null;
-            mKeyWords.TryGetValue(lex, out word);
-            return word == null ? Grammar.ID : word.WordType;
+            return mGrammar.config.scanner.GetKeywordToken(lex);
         }
     }
 }

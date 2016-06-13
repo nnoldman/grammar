@@ -19,7 +19,7 @@ namespace AGrammar
                 tree.propertices.Add(node);
             }
         }
-        internal void AddContent(GrammarTree tree, List<Token2> tokens, int n)
+        internal void AddContent(GrammarTree tree, List<Token> tokens, int n)
         {
             PropertyTreeNode node = new PropertyTreeNode();
             node.propName = name;

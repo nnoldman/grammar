@@ -45,7 +45,7 @@ namespace CSGrammar
             public const int Op2 = 23;
             public const int Return = 24;
         }
-        static KeyWord[] Tokens = new KeyWord[]
+        static KeyWord[] KeyWords = new KeyWord[]
         {
             //new KeyWord(){WordType= TokenID.Comment,Word="//"},
             new KeyWord(){WordType= TokenID.Using,Word="using"},
@@ -94,6 +94,7 @@ namespace CSGrammar
 
         Production Loader()
         {
+            Tests.TestNumberPaser();
             Production Root = Factory.Or("CSGrammar");
             Production Class = Factory.And("Class").Array().Node("Class");
             Production ClassBody = Factory.Or("Class_Body").Node("ClassBody");
@@ -184,7 +185,13 @@ namespace CSGrammar
         public GrammarTree Load(Action<string> messageHandler, string content)
         {
             Production root = Loader();
-            return g.Generate(root, content, Tokens, messageHandler);
+
+            AGrammar.Config config = new Config();
+            config.grammar.root = root;
+            config.msgHaneler = messageHandler;
+            config.scanner.keywords = KeyWords;
+
+            return g.Generate(config, content);
         }
 
         public void Dump(string file)

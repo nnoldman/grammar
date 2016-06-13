@@ -9,23 +9,22 @@ namespace AGrammar
 {
     internal class FrameError
     {
-        internal List<Token2> errors = new List<Token2>();
+        internal List<Token> errors = new List<Token>();
     }
     public class Grammar
     {
         public const int ID = 0;
-
         public const string EOFToken = "EOF";
-        public static int InvalidTokenType = -1;
-
-        Action<string> mMessageHandler;
-        KeyWord[] mExternTokens;
+        public const int InvalidTokenType = -1;
 
         Scanner mScanner;
-        List<Token2> mTokens;
+        List<Token> mTokens;
         GrammarTree mTree = new GrammarTree();
+        Config mConfig;
 
-        Dictionary<int, List<Token2>> mErrorStack = new Dictionary<int, List<Token2>>();
+        static int mErrorID;
+
+        Dictionary<int, List<Token>> mErrorStack = new Dictionary<int, List<Token>>();
 
         public static Production Empty
         {
@@ -37,17 +36,13 @@ namespace AGrammar
         public Grammar()
         {
             mScanner = new Scanner();
-            mTokens = new List<Token2>();
+            mTokens = new List<Token>();
         }
-        public string[] Termins
+        public Config config
         {
             get
             {
-                return mScanner.Termins;
-            }
-            set
-            {
-                mScanner.Termins = value;
+                return mConfig;
             }
         }
         public GrammarTree Tree
@@ -57,7 +52,7 @@ namespace AGrammar
                 return mTree;
             }
         }
-        internal List<Token2> Tokens
+        internal List<Token> Tokens
         {
             get
             {
@@ -66,20 +61,19 @@ namespace AGrammar
         }
         internal void Error(string msg)
         {
-            if (mMessageHandler != null)
-                mMessageHandler(msg);
+            if (mConfig.msgHaneler != null)
+                mConfig.msgHaneler(msg);
         }
 
-        static int mErrorID;
 
-        internal void PushError(int errid, Token2 token)
+        internal void PushError(int errid, Token token)
         {
             mErrorStack[errid].Add(token);
         }
         internal int RequireErrorID()
         {
             mErrorID++;
-            mErrorStack.Add(mErrorID, new List<Token2>());
+            mErrorStack.Add(mErrorID, new List<Token>());
             return mErrorID;
         }
         internal void PopError(int errorID)
@@ -94,7 +88,7 @@ namespace AGrammar
                 mErrorStack.Remove(i);
             mErrorStack.Remove(errorID);
         }
-        void Error(Token2 token)
+        void Error(Token token)
         {
             Error(string.Format("Load Error:{0}", token.ToString()));
         }
@@ -108,44 +102,25 @@ namespace AGrammar
             return new UTF8Encoding(false).GetBytes(sb.ToString().ToCharArray());
         }
 
-        public void LineComment(string s)
+        public GrammarTree Generate(Config config, string content)
         {
-            mScanner.LineComment = s;
-        }
-        public void AddTerminations(params string[] args)
-        {
-            mScanner.Termins = args;
-        }
-        public void BlockComment(string s, string e)
-        {
-            mScanner.BlockCommentStart = s;
-            mScanner.BlockCommentEnd = e;
+            mConfig = config;
 
-            Debug.Assert(!string.IsNullOrEmpty(mScanner.BlockCommentStart));
-            Debug.Assert(!string.IsNullOrEmpty(mScanner.BlockCommentEnd));
-        }
-
-        public GrammarTree Generate(Production root, string content, KeyWord[] tokens, Action<string> handler)
-        {
-            if (!root)
+            if (!mConfig.Valid)
                 return null;
-
-            this.mExternTokens = tokens;
-            this.mMessageHandler = handler;
-            this.mScanner.ErrorHandler = handler;
 
             DateTime t0 = DateTime.Now;
 
-            mTokens = mScanner.Scan(mExternTokens, content);
+            mTokens = mScanner.Scan(this, content);
 
-            mTree = GenerateTree(root);
+            mTree = GenerateTree(mConfig.grammar.root);
 
             ErrorReport();
 
             TimeSpan span = new TimeSpan(DateTime.Now.Ticks - t0.Ticks);
 
-            if (mMessageHandler != null)
-                mMessageHandler(string.Format("Time:{0:00}:{1:00}:{2:00}:{3:00}", span.Hours, span.Minutes, span.Seconds, span.Milliseconds));
+            if (mConfig.msgHaneler != null)
+                mConfig.msgHaneler(string.Format("Time:{0:00}:{1:00}:{2:00}:{3:00}", span.Hours, span.Minutes, span.Seconds, span.Milliseconds));
 
             return mTree;
         }
@@ -154,7 +129,7 @@ namespace AGrammar
             if (mErrorStack.Count == 0)
                 return;
 
-            List<Token2> errors = new List<Token2>();
+            List<Token> errors = new List<Token>();
             foreach (var i in mErrorStack)
             {
                 errors.AddRange(i.Value);
@@ -163,7 +138,7 @@ namespace AGrammar
             Error(errors[0].Error());
         }
 
-        int SortError(Token2 a, Token2 b)
+        int SortError(Token a, Token b)
         {
             if (a.Line == b.Line && a.Column == b.Column)
                 return 0;

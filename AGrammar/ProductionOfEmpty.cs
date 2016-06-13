@@ -17,7 +17,7 @@ namespace AGrammar
             return "Empty";
         }
 
-        internal override bool Match(List<Token2> tokens, ref int n, GrammarTree parentTree)
+        internal override bool Match(List<Token> tokens, ref int n, GrammarTree parentTree)
         {
             return true;
         }
