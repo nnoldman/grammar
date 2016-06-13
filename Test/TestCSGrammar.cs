@@ -2,9 +2,9 @@
 {
     int CX1()
     {
+        int id = 1002;
         float abc = 3.5;
         float b = 3E+2F;
-        int id = 1002;
         return 0;
     }
     public int id;

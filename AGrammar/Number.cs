@@ -11,44 +11,51 @@ namespace AGrammar
         internal enum State
         {
             Non,
-            Dot,//if dot
-            E_e,//if E/e
-            A_S,//if +/-
-            D_d,//if D/d
-            F_f,//if F/f
-            Int,//if terminals
+            Dot,//when dot
+            E_e,//when E/e
+            A_S,//when +/-
+            D_d,//when D/d
+            F_f,//when F/f
+            F_V,//when terminals
+            D_V,//when terminals
+            Int,//when terminals
         }
 
-        public delegate bool Translate(string content, int s, params char[] chars);
-        public delegate NumberToken Make(string content, int s, int end);
+        public delegate NumberToken Make(string content, int start, int end);
 
         internal class Translation
         {
             internal State Cur;
             internal State Nxt;
-            internal Translate Func;
-            internal Make Make;
+            internal Make Maker;
             internal char[] Chars;
         }
 
         public static Translation[] Tables = new Translation[]
         {
-            new Translation(){ Cur= State.Non,Nxt= State.Dot,Func=Non2Dot,Chars=new char[]{'.'}},
+            new Translation(){ Cur= State.Non,Nxt=State.Dot,Chars=new char[]{'.'}},
 
-            new Translation(){ Cur= State.Dot,Nxt= State.E_e,Func=Dot2E,Chars=new char[]{'E','e'}},
-            new Translation(){ Cur= State.E_e,Nxt= State.A_S,Func=E2AS,Chars=new char[]{'+','-'}},
+            new Translation(){ Cur= State.Dot,Nxt=State.E_e,Chars=new char[]{'E','e'}},
 
-            new Translation(){ Cur= State.A_S,Nxt= State.D_d,Func=AS2DF,Chars=new char[]{'D','d'}, Make=MakeDoubleToken},
-            new Translation(){ Cur= State.A_S,Nxt= State.F_f,Func=AS2DF,Chars=new char[]{'F','f'}, Make=MakeFloatToken},
+            new Translation(){ Cur= State.E_e,Nxt=State.A_S,Chars=new char[]{'+','-'}},
+
+            new Translation(){ Cur= State.A_S,Nxt=State.D_d,Chars=new char[]{'D','d'}},
+
+            new Translation(){ Cur= State.A_S,Nxt=State.F_f,Chars=new char[]{'F','f'}},
+
+            new Translation(){ Cur= State.Non,Nxt=State.D_d,Chars=new char[]{'D','d'}},
+
+            new Translation(){ Cur= State.Non,Nxt=State.F_f,Chars=new char[]{'F','f'}},
             
-            new Translation(){ Cur= State.Non,Nxt= State.D_d,Func=Non2DF,Chars=new char[]{'D','d'}, Make=MakeDoubleToken},
-            new Translation(){ Cur= State.Non,Nxt= State.F_f,Func=Non2DF,Chars=new char[]{'F','f'}, Make=MakeFloatToken},
+            new Translation(){ Cur= State.Non,Nxt=State.E_e,Chars=new char[]{'E','e'} },
             
-            new Translation(){ Cur= State.Non,Nxt= State.E_e,Func=Non2E,Chars=new char[]{'E','e'}, },
+            new Translation(){ Cur= State.D_d,Nxt=State.D_V,Maker=MakeDoubleToken},
+
+            new Translation(){ Cur= State.F_f,Nxt=State.F_V,Maker=MakeFloatToken},
+
+            new Translation(){ Cur= State.Non,Nxt=State.Int,Maker=MakeIntToken},
             
-            new Translation(){ Cur= State.Non,Nxt= State.Int,Func=Non2Int,Chars=new char[]{'E','e','.'}, Make=MakeIntToken},
-            
-            new Translation(){ Cur= State.Dot,Nxt= State.D_d,Func=Dot2D,Chars=null, Make=MakeDoubleToken},
+            new Translation(){ Cur= State.Dot,Nxt=State.D_d,Maker=MakeDoubleToken},
         };
 
         static NumberToken MakeIntToken(string content, int s, int end)
@@ -63,7 +70,9 @@ namespace AGrammar
         {
             FloatToken token = new FloatToken();
             token.Word = content.Substring(s, end - s);
-            token.value = float.Parse(token.Word);
+            char ch = token.Word[token.Word.Length - 1];
+            token.value = float.Parse(ch == 'F' || ch == 'f' ?
+                token.Word.Substring(0, token.Word.Length - 1) : token.Word);
             return token;
         }
 
@@ -71,18 +80,11 @@ namespace AGrammar
         {
             DoubleToken token = new DoubleToken();
             token.Word = content.Substring(s, end - s);
-            token.value = double.Parse(token.Word);
+            char ch = token.Word[token.Word.Length - 1];
+            token.value = double.Parse(ch == 'D' || ch == 'd' ?
+               token.Word.Substring(0, token.Word.Length - 1) : token.Word);
             return token;
         }
-
-        static bool Non2DF(string content, int s, params char[] chars)
-        {
-            char cur = content[s];
-            if (IsIn(cur, chars))
-                return true;
-            return false;
-        }
-
         static bool IsIn(char ch, params char[] chars)
         {
             for (int i = 0; i < chars.Length; ++i)
@@ -91,75 +93,6 @@ namespace AGrammar
             return false;
         }
 
-        static bool Non2E(string content, int s, params char[] chars)
-        {
-            char cur = content[s];
-            if (IsIn(cur, chars))
-                return true;
-            return false;
-        }
-
-        static bool Non2Int(string content, int s, params char[] chars)
-        {
-            char cur = content[s];
-            if (!IsIn(cur, chars) && !Helper.IsDigital(cur))
-                return true;
-            return false;
-        }
-
-        static bool Non2Dot(string content, int s, params char[] chars)
-        {
-            char cur = content[s];
-            if (IsIn(cur, chars) && NextIsDigital(content, s))
-                return true;
-            return false;
-        }
-        static bool Dot2E(string content, int s, params char[] chars)
-        {
-            char cur = content[s];
-            if (IsIn(cur, chars) && NextIsDigital(content, s))
-                return true;
-            return false;
-        }
-
-        static bool Dot2D(string content, int s, params char[] chars)
-        {
-            if (IsTerminal(content, s))
-                return true;
-            return false;
-        }
-
-        static bool E2AS(string content, int s, params char[] chars)
-        {
-            char cur = content[s];
-            if (IsIn(cur, chars) && NextIsDigital(content, s))
-                return true;
-            return false;
-        }
-        static bool AS2DF(string content, int s, params char[] chars)
-        {
-            char cur = content[s];
-            if (IsIn(cur, chars))
-                return true;
-            return false;
-        }
-        static bool NextIsDigital(string content, int s)
-        {
-            if (s + 1 < content.Length && Helper.IsDigital(content[s + 1]))
-                return true;
-            return false;
-        }
-
-        static bool NextIsTerminal(string content, int s)
-        {
-            if (s + 1 < content.Length)
-            {
-                char ch = content[s + 1];
-                if (Helper.IsDigital(ch) || Helper.IsLetter(ch))
-                    return false;
-            }
-            return true;
-        }
         static bool IsTerminal(string content, int s)
         {
             char ch = content[s];
@@ -167,29 +100,43 @@ namespace AGrammar
                 return false;
             return true;
         }
-        internal static NumberToken Parse(string content, int s)
-        {
-            State state = State.Non;
 
-            for (int i = s; i < content.Length; ++i)
+        static NumberToken MatchTables(string content, int i, int start, ref State state)
+        {
+            foreach (var trans in Tables)
             {
-                foreach (var trans in Tables)
+                if (trans.Cur == state)
                 {
-                    if (trans.Cur == state)
+                    char cur = content[i];
+
+                    if ((trans.Chars != null && IsIn(cur, trans.Chars))
+                        || (trans.Chars == null && IsTerminal(content, i)))
                     {
-                        if (trans.Func != null)
-                        {
-                            if (trans.Func(content, i, trans.Chars))
-                            {
-                                state = trans.Nxt;
-                                if (trans.Make != null)
-                                    return trans.Make(content, s, i);
-                            }
-                        }
+                        state = trans.Nxt;
+                        if (trans.Maker != null)
+                            return trans.Maker(content, start, i);
+                        break;
+                    }
+                    else if (Helper.IsDigital(cur))
+                    {
+                        break;
                     }
                 }
             }
             return null;
+        }
+
+        internal static NumberToken Parse(string content, int start)
+        {
+            State state = State.Non;
+
+            for (int i = start; i < content.Length; ++i)
+            {
+                NumberToken token = MatchTables(content, i, start, ref state);
+                if (token)
+                    return token;
+            }
+            throw new Exception();
         }
     }
 }
