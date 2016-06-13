@@ -16,8 +16,33 @@ namespace AGrammar
         public string lineComment;
         public string blockCommentStart;
         public string blockCommentEnd;
-        public string[] terminals;
         public KeyWord[] keywords;
+        public string[] terminals
+        {
+            get
+            {
+                return mTerminals;
+            }
+            set
+            {
+                List<string> rawList = new List<string>();
+                rawList.AddRange(value);
+                rawList.Sort(SortFunc);
+                mTerminals = rawList.ToArray();
+            }
+        }
+
+
+        static int SortFunc(string a, string b)
+        {
+            int la = a.Length;
+            int lb = b.Length;
+            if (la == lb)
+                return 0;
+            if (la > lb)
+                return -1;
+            return 1;
+        }
 
         public ScannerConfig()
         {
@@ -38,6 +63,7 @@ namespace AGrammar
         }
 
         protected Dictionary<string, int> mKeywordMap;
+        protected string[] mTerminals;
 
         Dictionary<string, int> keywordMap
         {
@@ -64,7 +90,7 @@ namespace AGrammar
         {
             get
             {
-                return grammar.root != null;
+                return grammar.root != null && scanner.terminals != null;
             }
         }
     }

@@ -10,5 +10,10 @@ namespace AGrammar
     {
         public int WordType;
         public string Word;
+
+        public override string ToString()
+        {
+            return string.Format("Keyword:({0}) {1}", WordType, Word);
+        }
     }
 }

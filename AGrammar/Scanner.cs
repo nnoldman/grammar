@@ -186,7 +186,7 @@ namespace AGrammar
                 }
             }
             if (tokens.Count > 0)
-                tokens.Add(new EOFToken());
+                tokens.Add(new EofToken());
 
             return tokens;
         }

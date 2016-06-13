@@ -14,7 +14,8 @@ namespace AGrammar
     public class Grammar
     {
         public const int ID = 0;
-        public const string EOFToken = "EOF";
+        public const string Eof = "EOF";
+        public const string NewLine = "BR";
         public const int InvalidTokenType = -1;
 
         Scanner mScanner;
@@ -31,6 +32,13 @@ namespace AGrammar
             get
             {
                 return new ProductionOfEmpty();
+            }
+        }
+        public static Production Any
+        {
+            get
+            {
+                return new ProductionAny();
             }
         }
         public Grammar()

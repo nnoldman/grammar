@@ -49,6 +49,7 @@
     <Compile Include="Node.cs" />
     <Compile Include="Number.cs" />
     <Compile Include="Op.cs" />
+    <Compile Include="ProductionAny.cs" />
     <Compile Include="Scanner.cs" />
     <Compile Include="Tests.cs" />
     <Compile Include="Token.cs" />

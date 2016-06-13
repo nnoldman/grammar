@@ -129,10 +129,15 @@ namespace CSGrammar
             Production OpMul = Factory.Symbol("*").Node("Op");
             Production OpDiv = Factory.Symbol("/").Node("Op");
             Production VTypeID = Factory.Symbol(Grammar.ID).Node("Type");
+            Production LineComment = Factory.And("LineComment");
+            Production BlockComment = Factory.And("BlockComment");
+            Production NewLine = Factory.Symbol(Grammar.NewLine);
+            Production EOF = Factory.Symbol(Grammar.Eof);
 
-            Production EOF = Factory.Symbol(Grammar.EOFToken);
+            LineComment.Add("//" + Grammar.Any + NewLine);
+            BlockComment.Add("/*" + Grammar.Any + "*/");
 
-            OP2.Add(OpAdd | OpSub );
+            OP2.Add(OpAdd | OpSub);
             OP3.Add(OpMul | OpDiv);
 
             V.Add(Var);
@@ -190,6 +195,9 @@ namespace CSGrammar
             config.grammar.root = root;
             config.msgHaneler = messageHandler;
             config.scanner.keywords = KeyWords;
+            //config.scanner.lineComment = "--";
+            //config.scanner.blockCommentStart = "[[";
+            //config.scanner.blockCommentEnd = "]]";
 
             return g.Generate(config, content);
         }

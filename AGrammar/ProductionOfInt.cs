@@ -24,7 +24,8 @@ namespace AGrammar
 
         internal override bool Match(List<Token> tokens, ref int n, GrammarTree parentTree)
         {
-            throw new Exception();
+            return false;
+            //throw new Exception();
 
             //if (tokens[n].Tag == tokenid)
             //{

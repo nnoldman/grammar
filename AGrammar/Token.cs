@@ -64,11 +64,11 @@ namespace AGrammar
             return this.lexeme;
         }
     }
-    internal class EOFToken : Token
+    internal class EofToken : Token
     {
-        internal EOFToken()
+        internal EofToken()
         {
-            Word = Grammar.EOFToken;
+            Word = Grammar.Eof;
         }
     }
     internal class TerminalToken : Token

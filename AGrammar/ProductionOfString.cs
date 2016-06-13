@@ -24,7 +24,7 @@ namespace AGrammar
 
         internal override bool Match(List<Token> tokens, ref int n, GrammarTree parentTree)
         {
-            if (tokens[n] is EOFToken)
+            if (tokens[n] is EofToken)
                 return true;
             if (tokens[n].Word == content)
             {
