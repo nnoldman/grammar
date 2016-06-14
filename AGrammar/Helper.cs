@@ -17,5 +17,26 @@ namespace AGrammar
         {
             return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch == '_';
         }
+
+        internal static bool IsIn(char ch, params char[] chars)
+        {
+            for (int i = 0; i < chars.Length; ++i)
+                if (ch == chars[i])
+                    return true;
+            return false;
+        }
+        internal static bool IsTerminal(char ch)
+        {
+            if (Helper.IsDigital(ch) || Helper.IsLetter(ch))
+                return false;
+            return true;
+        }
+        internal static bool IsTerminal(string content, int index)
+        {
+            char ch = content[index];
+            if (Helper.IsDigital(ch) || Helper.IsLetter(ch))
+                return false;
+            return true;
+        }
     }
 }

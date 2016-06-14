@@ -1,5 +1,7 @@
-﻿public class TestCSGrammar
+﻿public class TT2
 {
+    /*1234
+  8*/
     int CX1()
     {
         int id = 1002;
@@ -9,11 +11,7 @@
     }
     public int id;
     public string name;
-    /*1234
-     567
-     * fdsaf
-     * fds
-     8*/
+ 
     public void Count1(int/*fds*/ a)//fdasf
     {
         float b = 3E+2F;

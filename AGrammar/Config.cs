@@ -13,9 +13,6 @@ namespace AGrammar
 
     public class ScannerConfig
     {
-        public string lineComment;
-        public string blockCommentStart;
-        public string blockCommentEnd;
         public KeyWord[] keywords;
         public string[] terminals
         {
@@ -46,10 +43,8 @@ namespace AGrammar
 
         public ScannerConfig()
         {
-            lineComment = "//";
-            blockCommentStart = "/*";
-            blockCommentEnd = "*/";
             terminals = new string[]{
+            "//","/*","*/",
             "+=", "-=", "*=", "/=","<=", "==","!=", ">=", "||", "&&", "++", "--",
             "+", "-", "*", "/", ".", "=", "?", "(", ")", "{", "}", "[", "]","<",">" ,":", ";", ",", "|", "&",
             };

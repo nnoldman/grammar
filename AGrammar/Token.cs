@@ -74,6 +74,20 @@ namespace AGrammar
     internal class TerminalToken : Token
     {
     }
+    internal class LineFeedToken : TerminalToken
+    {
+        internal LineFeedToken()
+        {
+            Word = Grammar.LineFeed;
+        }
+
+        public override string ToString()
+        {
+            return "LF";
+        }
+    }
+
+ 
     internal class KeyWordToken : Token
     {
         public int Tag;

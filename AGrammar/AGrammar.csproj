@@ -47,7 +47,7 @@
     <Compile Include="ID.cs" />
     <Compile Include="KeyWord.cs" />
     <Compile Include="Node.cs" />
-    <Compile Include="Number.cs" />
+    <Compile Include="NumberBuilder.cs" />
     <Compile Include="Op.cs" />
     <Compile Include="ProductionAny.cs" />
     <Compile Include="Scanner.cs" />

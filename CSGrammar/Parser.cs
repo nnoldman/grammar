@@ -25,7 +25,6 @@ namespace CSGrammar
             public const int Permission = 4;
             public const int Memory = 5;
             public const int InnerType = 6;
-            public const int Comment = 7;
             public const int New = 8;
 
             public const int If = 9;
@@ -44,10 +43,13 @@ namespace CSGrammar
             public const int Equal2 = 22;
             public const int Op2 = 23;
             public const int Return = 24;
+
+            public const int LineComment = 1000;
+            public const int BlockCommentStart = 1001;
+            public const int BlockCommentEnd = 1002;
         }
         static KeyWord[] KeyWords = new KeyWord[]
         {
-            //new KeyWord(){WordType= TokenID.Comment,Word="//"},
             new KeyWord(){WordType= TokenID.Using,Word="using"},
             new KeyWord(){WordType= TokenID.Namespace,Word="namespace"},
             new KeyWord(){WordType= TokenID.Class,Word="class"},
@@ -131,7 +133,7 @@ namespace CSGrammar
             Production VTypeID = Factory.Symbol(Grammar.ID).Node("Type");
             Production LineComment = Factory.And("LineComment");
             Production BlockComment = Factory.And("BlockComment");
-            Production NewLine = Factory.Symbol(Grammar.NewLine);
+            Production NewLine = Factory.Symbol(Grammar.LineFeed);
             Production EOF = Factory.Symbol(Grammar.Eof);
 
             LineComment.Add("//" + Grammar.Any + NewLine);

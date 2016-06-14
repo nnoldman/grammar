@@ -15,7 +15,7 @@ namespace AGrammar
     {
         public const int ID = 0;
         public const string Eof = "EOF";
-        public const string NewLine = "BR";
+        public const string LineFeed = "\n";
         public const int InvalidTokenType = -1;
 
         Scanner mScanner;
